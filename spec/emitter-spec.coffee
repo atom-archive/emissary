@@ -17,22 +17,22 @@ describe "Emitter", ->
   describe "::on", ->
     describe "when called with multiple space-separated event names", ->
       it "subscribes to each of the event names", ->
-        emitter.on '    a.b  c.d\te ', fooHandler1
+        emitter.on '    a.b  c.d\te ', handler = jasmine.createSpy("handler")
 
         emitter.emit 'a'
-        expect(fooHandler1).toHaveBeenCalled()
+        expect(handler).toHaveBeenCalled()
 
-        fooHandler1.reset()
+        handler.reset()
         emitter.emit 'c'
-        expect(fooHandler1).toHaveBeenCalled()
+        expect(handler).toHaveBeenCalled()
 
-        fooHandler1.reset()
+        handler.reset()
         emitter.emit 'e'
-        expect(fooHandler1).toHaveBeenCalled()
+        expect(handler).toHaveBeenCalled()
 
-        fooHandler1.reset()
+        handler.reset()
         emitter.emit ''
-        expect(fooHandler1).not.toHaveBeenCalled()
+        expect(handler).not.toHaveBeenCalled()
 
   describe "::emit", ->
     describe "when called with a non-namespaced event name", ->
