@@ -208,14 +208,31 @@ describe "Emitter", ->
       expect(onceHandler).not.toHaveBeenCalled()
 
   describe "::getSubscriptionCount()", ->
-    it "returns the total number of subscriptions on the emitter", ->
-      expect(emitter.getSubscriptionCount()).toBe 3
+    describe "when not passed an event name", ->
+      it "returns the total number of subscriptions on the emitter", ->
+        expect(emitter.getSubscriptionCount()).toBe 3
 
-      emitter.on 'baz', ->
-      expect(emitter.getSubscriptionCount()).toBe 4
+        emitter.on 'baz', ->
+        expect(emitter.getSubscriptionCount()).toBe 4
 
-      emitter.off 'foo'
-      expect(emitter.getSubscriptionCount()).toBe 2
+        emitter.off 'foo'
+        expect(emitter.getSubscriptionCount()).toBe 2
+
+    describe "when passed an event name", ->
+      it "returns the total number of subscriptions for the given event name", ->
+        expect(emitter.getSubscriptionCount('baz')).toBe 0
+
+        emitter.on 'baz', handler1 = ->
+        expect(emitter.getSubscriptionCount('baz')).toBe 1
+
+        emitter.on 'baz', handler2 = ->
+        expect(emitter.getSubscriptionCount('baz')).toBe 2
+
+        emitter.off 'baz', handler2
+        expect(emitter.getSubscriptionCount('baz')).toBe 1
+
+        emitter.off 'baz', handler1
+        expect(emitter.getSubscriptionCount('baz')).toBe 0
 
   describe "::signal(eventName)", ->
     it "returns a signal that yields a value whenever an event by the given name is emitted", ->

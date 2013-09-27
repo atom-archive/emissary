@@ -87,11 +87,14 @@ class Emitter extends Mixin
       @queuedEvents = null
       @emit(event...) for event in queuedEvents
 
-  getSubscriptionCount: ->
-    count = 0
-    for name, handlers of @eventHandlersByEventName
-      count += handlers.length
-    count
+  getSubscriptionCount: (eventName) ->
+    if eventName?
+      @eventHandlersByEventName[eventName]?.length ? 0
+    else
+      count = 0
+      for name, handlers of @eventHandlersByEventName
+        count += handlers.length
+      count
 
 removeFromArray = (array, element) ->
   index = array.indexOf(element)
