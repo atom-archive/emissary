@@ -17,6 +17,8 @@ class Emitter extends Mixin
         @eventHandlersByNamespace[namespace][eventName] ?= []
         @eventHandlersByNamespace[namespace][eventName].push(handler)
 
+      @emit "#{eventName}-subscription", handler
+
     @afterSubscribe?()
 
   once: (eventName, handler) ->

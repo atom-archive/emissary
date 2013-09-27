@@ -34,6 +34,19 @@ describe "Emitter", ->
         emitter.emit ''
         expect(handler).not.toHaveBeenCalled()
 
+      it "emits a '{event-name}-subscription' event with the given handler for each named event", ->
+        emitter.on 'a-subscription', aSubscriptionHandler = jasmine.createSpy("aSubscriptionHandler")
+        emitter.on 'b-subscription', bSubscriptionHandler = jasmine.createSpy("bSubscriptionHandler")
+        emitter.on 'c-subscription', cSubscriptionHandler = jasmine.createSpy("cSubscriptionHandler")
+        emitter.on 'e-subscription', eSubscriptionHandler = jasmine.createSpy("eSubscriptionHandler")
+
+        emitter.on 'a.b c.d e', handler = ->
+
+        expect(aSubscriptionHandler).toHaveBeenCalledWith(handler)
+        expect(cSubscriptionHandler).toHaveBeenCalledWith(handler)
+        expect(eSubscriptionHandler).toHaveBeenCalledWith(handler)
+        expect(bSubscriptionHandler).not.toHaveBeenCalled()
+
   describe "::emit", ->
     describe "when called with a non-namespaced event name", ->
       it "calls all handlers that are subscribed to the given event name with the given data", ->
