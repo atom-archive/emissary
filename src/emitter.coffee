@@ -17,9 +17,8 @@ class Emitter extends Mixin
         @eventHandlersByNamespace[namespace][eventName] ?= []
         @eventHandlersByNamespace[namespace][eventName].push(handler)
 
-      @emit "#{eventName}-subscription", handler
-
-    @afterSubscribe?()
+      @emit "first-#{eventName}-subscription-added", handler if @getSubscriptionCount(eventName) is 1
+      @emit "#{eventName}-subscription-added", handler
 
   once: (eventName, handler) ->
     oneShotHandler = (args...) =>
@@ -63,18 +62,21 @@ class Emitter extends Mixin
                 removeFromArray(handlers, handler)
                 @off eventName, handler
         else
-          subscriptionCountBefore = @getSubscriptionCount()
-          if handler
-            eventHandlers = @eventHandlersByEventName[eventName]
-            removeFromArray(eventHandlers, handler) if eventHandlers
-          else
-            delete @eventHandlersByEventName?[eventName]
-          @afterUnsubscribe?() if @getSubscriptionCount() < subscriptionCountBefore
+          eventHandlers = @eventHandlersByEventName?[eventName]
+          return unless eventHandlers?
+
+          unless handler?
+            @off eventName, handler for handler in eventHandlers
+            return
+
+          if removeFromArray(eventHandlers, handler)
+            @emit "#{eventName}-subscription-removed", handler
+            if @getSubscriptionCount(eventName) is 0
+              @emit "last-#{eventName}-subscription-removed", handler
+              delete @eventHandlersByEventName[eventName]
     else
-      subscriptionCountBefore = @getSubscriptionCount()
-      @eventHandlersByEventName = {}
-      @eventHandlersByNamespace = {}
-      @afterUnsubscribe?() if @getSubscriptionCount() < subscriptionCountBefore
+      for eventName of @eventHandlersByEventName
+        @off(eventName)
 
   pauseEvents: ->
     @pauseCount ?= 0
@@ -98,6 +100,10 @@ class Emitter extends Mixin
 
 removeFromArray = (array, element) ->
   index = array.indexOf(element)
-  array.splice(index, 1) if index >= 0
+  if index > -1
+    array.splice(index, 1)
+    true
+  else
+    false
 
 Signal = require './signal'

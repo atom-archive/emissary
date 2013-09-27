@@ -16,7 +16,7 @@ describe "Emitter", ->
 
   describe "::on", ->
     describe "when called with multiple space-separated event names", ->
-      it "subscribes to each of the event names", ->
+      it "subscribes to each of the specified event names", ->
         emitter.on '    a.b  c.d\te ', handler = jasmine.createSpy("handler")
 
         emitter.emit 'a'
@@ -34,11 +34,11 @@ describe "Emitter", ->
         emitter.emit ''
         expect(handler).not.toHaveBeenCalled()
 
-      it "emits a '{event-name}-subscription' event with the given handler for each named event", ->
-        emitter.on 'a-subscription', aSubscriptionHandler = jasmine.createSpy("aSubscriptionHandler")
-        emitter.on 'b-subscription', bSubscriptionHandler = jasmine.createSpy("bSubscriptionHandler")
-        emitter.on 'c-subscription', cSubscriptionHandler = jasmine.createSpy("cSubscriptionHandler")
-        emitter.on 'e-subscription', eSubscriptionHandler = jasmine.createSpy("eSubscriptionHandler")
+      it "emits a '{event-name}-subscription-added' event with the given handler for each named event", ->
+        emitter.on 'a-subscription-added', aSubscriptionHandler = jasmine.createSpy("aSubscriptionHandler")
+        emitter.on 'b-subscription-added', bSubscriptionHandler = jasmine.createSpy("bSubscriptionHandler")
+        emitter.on 'c-subscription-added', cSubscriptionHandler = jasmine.createSpy("cSubscriptionHandler")
+        emitter.on 'e-subscription-added', eSubscriptionHandler = jasmine.createSpy("eSubscriptionHandler")
 
         emitter.on 'a.b c.d e', handler = ->
 
@@ -46,6 +46,20 @@ describe "Emitter", ->
         expect(cSubscriptionHandler).toHaveBeenCalledWith(handler)
         expect(eSubscriptionHandler).toHaveBeenCalledWith(handler)
         expect(bSubscriptionHandler).not.toHaveBeenCalled()
+
+      it "emits a 'first-{event-name}-subscription-added' if there were no previous handlers for the named event", ->
+        events = []
+        emitter.on 'first-b-subscription-added', (handler) -> events.push (['first-b-subscription-added', handler])
+        emitter.on 'b-subscription-added', (handler) -> events.push (['b-subscription-added', handler])
+
+        emitter.on 'b', handler1 = ->
+        emitter.on 'b', handler2 = ->
+
+        expect(events).toEqual [
+          ['first-b-subscription-added', handler1]
+          ['b-subscription-added', handler1]
+          ['b-subscription-added', handler2]
+        ]
 
   describe "::emit", ->
     describe "when called with a non-namespaced event name", ->
@@ -81,6 +95,20 @@ describe "Emitter", ->
     it "does not raise exceptions when called with non-existent events / namespaces", ->
       emitter.emit('junk')
       emitter.emit('junk.garbage')
+
+    it "emits '{event-name}-subscription-removed' and 'last-{event-name}-subscription-removed' events", ->
+      events = []
+      emitter.on 'foo-subscription-removed', (handler) -> events.push(['foo-subscription-removed', handler])
+      emitter.on 'last-foo-subscription-removed', (handler) -> events.push(['last-foo-subscription-removed', handler])
+
+      emitter.off 'foo', fooHandler1
+      emitter.off 'foo', fooHandler2
+
+      expect(events).toEqual [
+        ['foo-subscription-removed', fooHandler1]
+        ['foo-subscription-removed', fooHandler2]
+        ['last-foo-subscription-removed', fooHandler2]
+      ]
 
   describe "::off", ->
     describe "when called with no arguments", ->
