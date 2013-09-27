@@ -19,3 +19,9 @@ class Signal
       if predicate.call(newValue, newValue)
         signal.emit('value', newValue)
     signal
+
+  map: (fn) ->
+    signal = new Signal
+    signal.subscribe this, 'value', (newValue) ->
+      signal.emit('value', fn(newValue))
+    signal
