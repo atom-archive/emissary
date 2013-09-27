@@ -1,4 +1,5 @@
 Mixin = require './mixin'
+Signal = null # required below to avoid circularity
 
 module.exports =
 class Emitter extends Mixin
@@ -24,6 +25,10 @@ class Emitter extends Mixin
       handler(args...)
 
     @on eventName, oneShotHandler
+
+  signal: (eventName) ->
+    @signalsByEventName ?= {}
+    @signalsByEventName[eventName] ?= Signal.fromEmitter(this, eventName)
 
   emit: (eventName, args...) ->
     if @queuedEvents
@@ -89,3 +94,5 @@ class Emitter extends Mixin
 removeFromArray = (array, element) ->
   index = array.indexOf(element)
   array.splice(index, 1) if index >= 0
+
+Signal = require './signal'

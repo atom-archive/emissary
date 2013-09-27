@@ -203,3 +203,15 @@ describe "Emitter", ->
 
       emitter.off 'foo'
       expect(emitter.getSubscriptionCount()).toBe 2
+
+  describe "::signal(eventName)", ->
+    it "returns a signal that yields a value whenever an event by the given name is emitted", ->
+      signal = emitter.signal('a')
+      signal.on 'value', handler = jasmine.createSpy("handler")
+
+      emitter.emit('a', 'hello')
+      expect(handler).toHaveBeenCalledWith('hello')
+      handler.reset()
+
+      emitter.emit('a', 'goodbye')
+      expect(handler).toHaveBeenCalledWith('goodbye')
