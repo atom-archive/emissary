@@ -26,6 +26,16 @@ describe "Behavior", ->
       emitter.emit 'a', i for i in [1..5]
       expect(values).toEqual [1, 2, 4, 7, 11, 16]
 
+  describe "::diff(initialValue, fn)", ->
+    it "returns a behavior yielding the result of the function for previous and new value of the observable", ->
+      values = []
+      behavior = behavior.diff 0, (oldValue, newValue) -> oldValue + newValue
+      behavior.onValue (value) -> values.push(value)
+
+      expect(values).toEqual [1]
+      emitter.emit 'a', i for i in [1..5]
+      expect(values).toEqual [1, 2, 3, 5, 7, 9]
+
   describe "::filter(predicate)", ->
     it "returns a new behavior that only changes to values matching the given predicate", ->
       values = []

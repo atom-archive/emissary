@@ -26,6 +26,15 @@ class Observable
       @subscribe source, 'value', (newValue) =>
         @emit 'value', oldValue = fn(oldValue, newValue)
 
+  diff: (initialValue, fn) ->
+    source = this
+    @buildBehavior ->
+      oldValue = initialValue
+      @subscribe source, 'value', (newValue) =>
+        fnOldValue = oldValue
+        oldValue = newValue
+        @emit 'value', fn(fnOldValue, newValue)
+
   filter: (predicate) ->
     source = this
     new @constructor ->
