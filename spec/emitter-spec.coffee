@@ -47,16 +47,16 @@ describe "Emitter", ->
         expect(eSubscriptionHandler).toHaveBeenCalledWith(handler)
         expect(bSubscriptionHandler).not.toHaveBeenCalled()
 
-      it "emits a 'first-{event-name}-subscription-added' if there were no previous handlers for the named event", ->
+      it "emits a 'first-{event-name}-subscription-will-be-added' if there are no other handlers for the named event", ->
         events = []
-        emitter.on 'first-b-subscription-added', (handler) -> events.push (['first-b-subscription-added', handler])
+        emitter.on 'first-b-subscription-will-be-added', (handler) -> events.push (['first-b-subscription-will-be-added', handler])
         emitter.on 'b-subscription-added', (handler) -> events.push (['b-subscription-added', handler])
 
         emitter.on 'b', handler1 = ->
         emitter.on 'b', handler2 = ->
 
         expect(events).toEqual [
-          ['first-b-subscription-added', handler1]
+          ['first-b-subscription-will-be-added', handler1]
           ['b-subscription-added', handler1]
           ['b-subscription-added', handler2]
         ]
@@ -148,7 +148,7 @@ describe "Emitter", ->
         expect(fooHandler1).not.toHaveBeenCalled()
         expect(fooHandler2).toHaveBeenCalled()
 
-      it "does not throw an exception if there was no subscriptino for the given handler", ->
+      it "does not throw an exception if there was no subscription for the given handler", ->
         expect(-> emitter.off 'marco', -> "nothing").not.toThrow()
 
     describe "when there are namespaced event handlers", ->

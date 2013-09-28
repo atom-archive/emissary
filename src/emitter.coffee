@@ -7,6 +7,9 @@ class Emitter extends Mixin
     for eventName in eventNames.split(/\s+/) when eventName isnt ''
       [eventName, namespace] = eventName.split('.')
 
+      if @getSubscriptionCount(eventName) is 0
+        @emit "first-#{eventName}-subscription-will-be-added", handler
+
       @eventHandlersByEventName ?= {}
       @eventHandlersByEventName[eventName] ?= []
       @eventHandlersByEventName[eventName].push(handler)
@@ -17,7 +20,6 @@ class Emitter extends Mixin
         @eventHandlersByNamespace[namespace][eventName] ?= []
         @eventHandlersByNamespace[namespace][eventName].push(handler)
 
-      @emit "first-#{eventName}-subscription-added", handler if @getSubscriptionCount(eventName) is 1
       @emit "#{eventName}-subscription-added", handler
 
   once: (eventName, handler) ->
@@ -91,10 +93,10 @@ class Emitter extends Mixin
 
   getSubscriptionCount: (eventName) ->
     if eventName?
-      @eventHandlersByEventName[eventName]?.length ? 0
+      @eventHandlersByEventName?[eventName]?.length ? 0
     else
       count = 0
-      for name, handlers of @eventHandlersByEventName
+      for name, handlers of @eventHandlersByEventName ? {}
         count += handlers.length
       count
 

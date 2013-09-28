@@ -10,19 +10,21 @@ class Observable
   onValue: (handler) -> @on 'value', handler
 
   toBehavior: (initialValue) ->
-    behavior = new Behavior(this, initialValue)
+    source = this
+    new Behavior initialValue, ->
+      @subscribe source, 'value', (value) =>
+        @emit 'value', value
 
   filter: (predicate) ->
-    observable = @buildObservable()
-    observable.subscribe this, 'value', (newValue) ->
-      if predicate.call(newValue, newValue)
-        observable.emit('value', newValue)
-    observable
+    source = this
+    new @constructor ->
+      @subscribe source, 'value', (value) =>
+        @emit 'value', value if predicate.call(value, value)
 
   map: (fn) ->
-    observable = @buildObservable()
-    observable.subscribe this, 'value', (newValue) ->
-      observable.emit('value', fn(newValue))
-    observable
+    source = this
+    new @constructor ->
+      @subscribe source, 'value', (value) =>
+        @emit 'value', fn(value)
 
 Behavior = require './behavior'

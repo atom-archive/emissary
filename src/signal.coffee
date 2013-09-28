@@ -2,10 +2,11 @@ Observable = require './observable'
 
 module.exports =
 class Signal extends Observable
-  @fromEmitter: (emitter, eventName) ->
-    signal = new Signal
-    emitter.on eventName, (event) -> signal.emit 'value', event
-    signal
+  constructor: (subscribe) ->
+    @on 'first-value-subscription-will-be-added', => subscribe.call(this)
+    @on 'last-value-subscription-removed', => @unsubscribe()
 
-  buildObservable: ->
-    new Signal
+  @fromEmitter: (emitter, eventName) ->
+    new Signal ->
+      @subscribe emitter, eventName, (event) =>
+        @emit 'value', event
