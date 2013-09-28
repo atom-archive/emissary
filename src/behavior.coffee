@@ -32,11 +32,7 @@ class Behavior extends Signal
         gotFirst = true
 
   becomes: (targetValue) ->
-    @diff null, (oldValue, newValue) ->
-      unless isEqual(oldValue, newValue)
-        if isEqual(newValue, targetValue)
-          true
-        else if isEqual(oldValue, targetValue)
-          false
+    @map (value) ->
+      value is targetValue
+    .distinctUntilChanged()
     .changes()
-    .filterDefined()
