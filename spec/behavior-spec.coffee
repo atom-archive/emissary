@@ -16,6 +16,16 @@ describe "Behavior", ->
       emitter.emit 'a', 44
       expect(handler).toHaveBeenCalledWith(44)
 
+  describe "::scan(initialValue, fn)", ->
+    it "returns a behavior yielding the given initial value, then a new value produced by calling the given function with the previous and new values for every change", ->
+      values = []
+      behavior = behavior.scan 0, (oldValue, newValue) -> oldValue + newValue
+      behavior.onValue (value) -> values.push(value)
+
+      expect(values).toEqual [1]
+      emitter.emit 'a', i for i in [1..5]
+      expect(values).toEqual [1, 2, 4, 7, 11, 16]
+
   describe "::filter(predicate)", ->
     it "returns a new behavior that only changes to values matching the given predicate", ->
       values = []

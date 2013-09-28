@@ -19,6 +19,13 @@ class Observable
       @subscribe source, 'value', (value) =>
         @emit 'value', value
 
+  scan: (initialValue, fn) ->
+    source = this
+    @buildBehavior initialValue, ->
+      oldValue = initialValue
+      @subscribe source, 'value', (newValue) =>
+        @emit 'value', oldValue = fn(oldValue, newValue)
+
   filter: (predicate) ->
     source = this
     new @constructor ->
