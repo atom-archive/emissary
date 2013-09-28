@@ -1,3 +1,5 @@
+isEqual = require 'tantamount'
+
 Emitter = require './emitter'
 Subscriber = require './subscriber'
 Behavior = null

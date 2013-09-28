@@ -60,6 +60,19 @@ describe "Behavior", ->
       emitter.emit 'a', i for i in [1..5]
       expect(values).toEqual [1, 2, 3, 5, 7, 9]
 
+  describe "::distinctUntilChanged()", ->
+    it "returns a signal that yields a value only when the source signal emits a different value from the previous", ->
+      values = []
+      behavior.distinctUntilChanged().onValue (v) -> values.push(v)
+
+      expect(values).toEqual [1]
+      emitter.emit('a', 1)
+      emitter.emit('a', 1)
+      expect(values).toEqual [1]
+      emitter.emit('a', 2)
+      emitter.emit('a', 2)
+      expect(values).toEqual [1, 2]
+
   describe "::filter(predicate)", ->
     it "returns a new behavior that only changes to values matching the given predicate", ->
       values = []
