@@ -1,4 +1,4 @@
-Signal = require './observable'
+Signal = require './signal'
 
 module.exports =
 class Behavior extends Signal

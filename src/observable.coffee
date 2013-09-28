@@ -9,9 +9,13 @@ class Observable
 
   onValue: (handler) -> @on 'value', handler
 
+  buildBehavior: (args...) ->
+    Behavior ?= require './behavior'
+    new Behavior(args...)
+
   toBehavior: (initialValue) ->
     source = this
-    new Behavior initialValue, ->
+    @buildBehavior initialValue, ->
       @subscribe source, 'value', (value) =>
         @emit 'value', value
 
@@ -26,5 +30,3 @@ class Observable
     new @constructor ->
       @subscribe source, 'value', (value) =>
         @emit 'value', fn(value)
-
-Behavior = require './behavior'

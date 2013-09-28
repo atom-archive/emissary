@@ -30,6 +30,7 @@ class Emitter extends Mixin
     @on eventName, oneShotHandler
 
   signal: (eventName) ->
+    Signal ?= require './signal'
     @signalsByEventName ?= {}
     @signalsByEventName[eventName] ?= Signal.fromEmitter(this, eventName)
 
@@ -107,5 +108,3 @@ removeFromArray = (array, element) ->
     true
   else
     false
-
-Signal = require './signal'
