@@ -17,6 +17,20 @@ describe "Behavior", ->
       emitter.emit 'a', 8
       expect(handler).toHaveBeenCalledWith(8)
 
+  describe "::becomes(value)", ->
+    it "emits true when the behavior's value changes to the given value from another value, and false when it changes in the other direction", ->
+      behavior.becomes(5).onValue handler = jasmine.createSpy("handler")
+      expect(handler).not.toHaveBeenCalled()
+      emitter.emit 'a', 4
+      expect(handler).not.toHaveBeenCalled()
+      emitter.emit 'a', 5
+      expect(handler).toHaveBeenCalledWith(true)
+      handler.reset()
+      emitter.emit 'a', 5
+      expect(handler).not.toHaveBeenCalled()
+      emitter.emit 'a', 10
+      expect(handler).toHaveBeenCalledWith(false)
+
   describe "::toBehavior(initialValue)", ->
     it "returns a new behavior with the same initial value", ->
       newBehavior = behavior.toBehavior()

@@ -1,3 +1,4 @@
+isEqual = require 'tantamount'
 Signal = require './signal'
 
 module.exports =
@@ -29,3 +30,13 @@ class Behavior extends Signal
         if gotFirst
           @emit 'value', value
         gotFirst = true
+
+  becomes: (targetValue) ->
+    @diff null, (oldValue, newValue) ->
+      unless isEqual(oldValue, newValue)
+        if isEqual(newValue, targetValue)
+          true
+        else if isEqual(oldValue, targetValue)
+          false
+    .changes()
+    .filterDefined()

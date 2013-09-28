@@ -41,6 +41,9 @@ class Observable
       @subscribe source, 'value', (value) =>
         @emit 'value', value if predicate.call(value, value)
 
+  filterDefined: ->
+    @filter (value) -> value?
+
   map: (fn) ->
     source = this
     new @constructor ->
