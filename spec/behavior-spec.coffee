@@ -7,6 +7,16 @@ describe "Behavior", ->
     emitter = new Emitter
     behavior = emitter.signal('a').toBehavior(1)
 
+  describe "::changes()", ->
+    it "emits all changes to the behavior, but not its initial value", ->
+      behavior.changes().onValue handler = jasmine.createSpy("handler")
+      expect(handler).not.toHaveBeenCalled()
+      emitter.emit 'a', 7
+      expect(handler).toHaveBeenCalledWith(7)
+      handler.reset()
+      emitter.emit 'a', 8
+      expect(handler).toHaveBeenCalledWith(8)
+
   describe "::toBehavior(initialValue)", ->
     it "returns a new behavior with the same initial value", ->
       newBehavior = behavior.toBehavior()

@@ -19,3 +19,13 @@ class Behavior extends Signal
       @unsubscribe() if @getSubscriptionCount('value') is 1 # our self-subscription above doesn't count
 
     @on 'value-subscription-added', (handler) -> handler(latestValue)
+
+  # TODO: Write in terms of ::skip when it's added
+  changes: ->
+    source = this
+    new Signal ->
+      gotFirst = false
+      source.onValue (value) =>
+        if gotFirst
+          @emit 'value', value
+        gotFirst = true
