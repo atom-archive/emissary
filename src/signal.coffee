@@ -101,6 +101,12 @@ class Signal
     .distinctUntilChanged()
     .skipUntil(true)
 
+  becomesLessThan: (targetValue) ->
+    @becomes (value) -> value < targetValue
+
+  becomesGreaterThan: (targetValue) ->
+    @becomes (value) -> value > targetValue
+
   # Private: Builds a Behavior instance, lazily requiring the Behavior subclass
   # to avoid circular require.
   buildBehavior: (args...) ->
