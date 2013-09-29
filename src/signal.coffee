@@ -1,3 +1,4 @@
+isEqual = require 'tantamount'
 Observable = require './observable'
 
 module.exports =
@@ -10,6 +11,9 @@ class Signal extends Observable
     new Signal ->
       @subscribe emitter, eventName, (event) =>
         @emit 'value', event
+
+  changes: ->
+    this
 
   distinctUntilChanged: ->
     source = this
@@ -27,3 +31,14 @@ class Signal extends Observable
           receivedValue = true
           oldValue = newValue
           @emit 'value', newValue
+
+
+  becomes: (targetValue) ->
+    @distinctUntilChanged()
+    .diff undefined, (oldValue, newValue) ->
+      if isEqual(newValue, targetValue)
+        true
+      else if isEqual(oldValue, targetValue)
+        false
+    .filterDefined()
+    .changes()

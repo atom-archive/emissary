@@ -66,3 +66,17 @@ describe "Signal", ->
       expect(values).toEqual []
       emitter.emit('a', i) for i in [0..10]
       expect(values).toEqual [2..12]
+
+  describe "::becomes(value)", ->
+    it "emits true when the behavior's value changes to the given value from another value, and false when it changes in the other direction", ->
+      signal.becomes(5).onValue handler = jasmine.createSpy("handler")
+      expect(handler).not.toHaveBeenCalled()
+      emitter.emit 'a', 4
+      expect(handler).not.toHaveBeenCalled()
+      emitter.emit 'a', 5
+      expect(handler).toHaveBeenCalledWith(true)
+      handler.reset()
+      emitter.emit 'a', 5
+      expect(handler).not.toHaveBeenCalled()
+      emitter.emit 'a', 10
+      expect(handler).toHaveBeenCalledWith(false)

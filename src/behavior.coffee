@@ -1,4 +1,3 @@
-isEqual = require 'tantamount'
 Signal = require './signal'
 
 module.exports =
@@ -30,9 +29,3 @@ class Behavior extends Signal
         if gotFirst
           @emit 'value', value
         gotFirst = true
-
-  becomes: (targetValue) ->
-    @map (value) ->
-      value is targetValue
-    .distinctUntilChanged()
-    .changes()
