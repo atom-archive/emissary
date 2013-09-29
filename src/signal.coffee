@@ -90,15 +90,16 @@ class Signal
           oldValue = newValue
           @emit 'value', newValue
 
-  becomes: (targetValue) ->
-    @distinctUntilChanged()
-    .diff undefined, (oldValue, newValue) ->
-      if isEqual(newValue, targetValue)
-        true
-      else if isEqual(oldValue, targetValue)
-        false
-    .filterDefined()
-    .changes()
+  becomes: (predicateOrTargetValue) ->
+    unless typeof predicateOrTargetValue is 'function'
+      targetValue = predicateOrTargetValue
+      return @becomes (value) -> isEqual(value, targetValue)
+
+    predicate = predicateOrTargetValue
+    @changes()
+    .map((value) -> !!predicate(value))
+    .distinctUntilChanged()
+    .skipUntil(true)
 
   # Private: Builds a Behavior instance, lazily requiring the Behavior subclass
   # to avoid circular require.

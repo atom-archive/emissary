@@ -96,16 +96,31 @@ describe "Signal", ->
       emitter.emit('a', 2)
       expect(values).toEqual [1, 2]
 
-  describe "::becomes(value)", ->
-    it "emits true when the source emits the target value and false when it subsequently emits a different value", ->
-      signal.becomes(5).onValue handler = jasmine.createSpy("handler")
-      expect(handler).not.toHaveBeenCalled()
-      emitter.emit 'a', 4
-      expect(handler).not.toHaveBeenCalled()
-      emitter.emit 'a', 5
-      expect(handler).toHaveBeenCalledWith(true)
-      handler.reset()
-      emitter.emit 'a', 5
-      expect(handler).not.toHaveBeenCalled()
-      emitter.emit 'a', 10
-      expect(handler).toHaveBeenCalledWith(false)
+  describe "::becomes(valueOrPredicate)", ->
+    describe "when passed a value", ->
+      it "emits true when the source emits the target value and false when it subsequently emits a different value", ->
+        signal.becomes(5).onValue handler = jasmine.createSpy("handler")
+        expect(handler).not.toHaveBeenCalled()
+        emitter.emit 'a', 4
+        expect(handler).not.toHaveBeenCalled()
+        emitter.emit 'a', 5
+        expect(handler).toHaveBeenCalledWith(true)
+        handler.reset()
+        emitter.emit 'a', 5
+        expect(handler).not.toHaveBeenCalled()
+        emitter.emit 'a', 10
+        expect(handler).toHaveBeenCalledWith(false)
+
+    describe "when passed a predicate", ->
+      it "emits true the signal emits a value matching the predicate and false when it subsequently emits a value that does not match the predicate", ->
+        signal.becomes((v) -> v > 5).onValue handler = jasmine.createSpy("handler")
+        expect(handler).not.toHaveBeenCalled()
+        emitter.emit 'a', 4
+        expect(handler).not.toHaveBeenCalled()
+        emitter.emit 'a', 10
+        expect(handler).toHaveBeenCalledWith(true)
+        handler.reset()
+        emitter.emit 'a', 8
+        expect(handler).not.toHaveBeenCalled()
+        emitter.emit 'a', 4
+        expect(handler).toHaveBeenCalledWith(false)
