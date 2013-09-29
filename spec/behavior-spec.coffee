@@ -106,43 +106,35 @@ describe "Behavior", ->
 
   describe "::becomes(valueOrPredicate)", ->
     describe "when passed a value", ->
-      it "emits true when the behavior changes to the target value and false when it subsequently changes to a different value", ->
-        behavior.becomes(5).onValue handler = jasmine.createSpy("handler")
-        expect(handler).not.toHaveBeenCalled()
+      it "emits true when the behavior changes from a non-target value to the target value and false when it changes from the target value to a non-target value", ->
+        values = []
+        behavior.becomes(1).onValue (v) -> values.push(v)
+        expect(values).toEqual []
         emitter.emit 'a', 4
-        expect(handler).not.toHaveBeenCalled()
         emitter.emit 'a', 5
-        expect(handler).toHaveBeenCalledWith(true)
-        handler.reset()
+        expect(values).toEqual [false]
+        emitter.emit 'a', 1
+        emitter.emit 'a', 1
+        expect(values).toEqual [false, true]
         emitter.emit 'a', 5
-        expect(handler).not.toHaveBeenCalled()
-        emitter.emit 'a', 10
-        expect(handler).toHaveBeenCalledWith(false)
+        emitter.emit 'a', 7
+        expect(values).toEqual [false, true, false]
+        emitter.emit 'a', 1
+        expect(values).toEqual [false, true, false, true]
 
     describe "when passed a predicate", ->
-      it "emits true when the behavior changes to a value matching the predicate and false when subsquently changes to a value that does not match", ->
-        behavior.becomes((v) -> v > 5).onValue handler = jasmine.createSpy("handler")
-        expect(handler).not.toHaveBeenCalled()
+      it "emits true when the behavior changes from a non-matching value to a matching value and false when it changes from a matching value to a non-matching value", ->
+        values = []
+        behavior.becomes((v) -> v < 5).onValue (v) -> values.push(v)
+        expect(values).toEqual []
         emitter.emit 'a', 4
-        expect(handler).not.toHaveBeenCalled()
-        emitter.emit 'a', 10
-        expect(handler).toHaveBeenCalledWith(true)
-        handler.reset()
-        emitter.emit 'a', 8
-        expect(handler).not.toHaveBeenCalled()
-        emitter.emit 'a', 4
-        expect(handler).toHaveBeenCalledWith(false)
-
-  describe "::becomes(value)", ->
-    it "emits true when the behavior changes *to* the target value and false when it changes *away* from the target value", ->
-      behavior.becomes(5).onValue handler = jasmine.createSpy("handler")
-      expect(handler).not.toHaveBeenCalled()
-      emitter.emit 'a', 4
-      expect(handler).not.toHaveBeenCalled()
-      emitter.emit 'a', 5
-      expect(handler).toHaveBeenCalledWith(true)
-      handler.reset()
-      emitter.emit 'a', 5
-      expect(handler).not.toHaveBeenCalled()
-      emitter.emit 'a', 10
-      expect(handler).toHaveBeenCalledWith(false)
+        expect(values).toEqual []
+        emitter.emit 'a', 5
+        expect(values).toEqual [false]
+        emitter.emit 'a', 6
+        emitter.emit 'a', 7
+        expect(values).toEqual [false]
+        emitter.emit 'a', 1
+        expect(values).toEqual [false, true]
+        emitter.emit 'a', 5
+        expect(values).toEqual [false, true, false]

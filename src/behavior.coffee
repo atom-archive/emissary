@@ -1,3 +1,4 @@
+isEqual = require 'tantamount'
 Signal = require './signal'
 
 module.exports =
@@ -32,3 +33,19 @@ class Behavior extends Signal
         if gotFirst
           @emit 'value', value
         gotFirst = true
+
+  becomes: (predicateOrTargetValue) ->
+    unless typeof predicateOrTargetValue is 'function'
+      targetValue = predicateOrTargetValue
+      return @becomes (value) -> isEqual(value, targetValue)
+
+    predicate = predicateOrTargetValue
+    @map((value) -> !!predicate(value))
+    .distinctUntilChanged()
+    .changes()
+
+  becomesLessThan: (targetValue) ->
+    @becomes (value) -> value < targetValue
+
+  becomesGreaterThan: (targetValue) ->
+    @becomes (value) -> value > targetValue

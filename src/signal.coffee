@@ -90,23 +90,6 @@ class Signal
           oldValue = newValue
           @emit 'value', newValue
 
-  becomes: (predicateOrTargetValue) ->
-    unless typeof predicateOrTargetValue is 'function'
-      targetValue = predicateOrTargetValue
-      return @becomes (value) -> isEqual(value, targetValue)
-
-    predicate = predicateOrTargetValue
-    @changes()
-    .map((value) -> !!predicate(value))
-    .distinctUntilChanged()
-    .skipUntil(true)
-
-  becomesLessThan: (targetValue) ->
-    @becomes (value) -> value < targetValue
-
-  becomesGreaterThan: (targetValue) ->
-    @becomes (value) -> value > targetValue
-
   # Private: Builds a Behavior instance, lazily requiring the Behavior subclass
   # to avoid circular require.
   buildBehavior: (args...) ->
