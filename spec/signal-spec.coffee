@@ -38,6 +38,31 @@ describe "Signal", ->
       emitter.emit('a', i) for i in [0..10]
       expect(values).toEqual [2..12]
 
+  describe "::skipUntil(valueOrPredicate)", ->
+    describe "when passed a value", ->
+      it "skips all values until encountering a value that matches the target value", ->
+        values = []
+        signal.skipUntil(5).onValue (v) -> values.push(v)
+        expect(values).toEqual []
+        emitter.emit 'a', 0
+        emitter.emit 'a', 10
+        emitter.emit 'a', 5
+        emitter.emit 'a', 4
+        emitter.emit 'a', 6
+        expect(values).toEqual [5, 4, 6]
+
+    describe "when passed a predicate", ->
+      it "skips all values until the predicate obtains", ->
+        values = []
+        signal.skipUntil((v) -> v > 5).onValue (v) -> values.push(v)
+        expect(values).toEqual []
+        emitter.emit 'a', 0
+        emitter.emit 'a', 10
+        emitter.emit 'a', 5
+        emitter.emit 'a', 4
+        emitter.emit 'a', 6
+        expect(values).toEqual [10, 5, 4, 6]
+
   describe "::scan(initialValue, fn)", ->
     it "returns a behavior yielding the given initial value, then a new value produced by calling the given function with the previous and new values for every change", ->
       values = []

@@ -43,6 +43,20 @@ class Signal
       @subscribe source, 'value', (value) =>
         @emit 'value', fn(value)
 
+  skipUntil: (predicateOrTargetValue) ->
+    unless typeof predicateOrTargetValue is 'function'
+      targetValue = predicateOrTargetValue
+      return @skipUntil (value) -> isEqual(value, targetValue)
+
+    predicate = predicateOrTargetValue
+    doneSkipping = false
+    @filter (value) ->
+      return true if doneSkipping
+      if predicate(value)
+        doneSkipping = true
+      else
+        false
+
   scan: (initialValue, fn) ->
     source = this
     @buildBehavior initialValue, ->
