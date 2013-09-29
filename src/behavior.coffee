@@ -20,6 +20,9 @@ class Behavior extends Signal
 
     @on 'value-subscription-added', (handler) -> handler(latestValue)
 
+  toBehavior: ->
+    this
+
   # TODO: Write in terms of ::skip when it's added
   changes: ->
     source = this

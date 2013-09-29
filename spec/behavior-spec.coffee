@@ -7,6 +7,10 @@ describe "Behavior", ->
     emitter = new Emitter
     behavior = emitter.signal('a').toBehavior(1)
 
+  describe "::toBehavior()", ->
+    it "returns itself because it's already a behavior", ->
+      expect(behavior.toBehavior()).toBe behavior
+
   describe "::changes()", ->
     it "emits all changes to the behavior, but not its initial value", ->
       behavior.changes().onValue handler = jasmine.createSpy("handler")
@@ -16,62 +20,6 @@ describe "Behavior", ->
       handler.reset()
       emitter.emit 'a', 8
       expect(handler).toHaveBeenCalledWith(8)
-
-  describe "::becomes(value)", ->
-    it "emits true when the behavior's value changes to the given value from another value, and false when it changes in the other direction", ->
-      behavior.becomes(5).onValue handler = jasmine.createSpy("handler")
-      expect(handler).not.toHaveBeenCalled()
-      emitter.emit 'a', 4
-      expect(handler).not.toHaveBeenCalled()
-      emitter.emit 'a', 5
-      expect(handler).toHaveBeenCalledWith(true)
-      handler.reset()
-      emitter.emit 'a', 5
-      expect(handler).not.toHaveBeenCalled()
-      emitter.emit 'a', 10
-      expect(handler).toHaveBeenCalledWith(false)
-
-  describe "::toBehavior(initialValue)", ->
-    it "returns a new behavior with the same initial value", ->
-      newBehavior = behavior.toBehavior()
-      newBehavior.onValue(handler = jasmine.createSpy("handler"))
-      expect(handler).toHaveBeenCalledWith(1)
-      handler.reset()
-      emitter.emit 'a', 44
-      expect(handler).toHaveBeenCalledWith(44)
-
-  describe "::scan(initialValue, fn)", ->
-    it "returns a behavior yielding the given initial value, then a new value produced by calling the given function with the previous and new values for every change", ->
-      values = []
-      behavior = behavior.scan 0, (oldValue, newValue) -> oldValue + newValue
-      behavior.onValue (value) -> values.push(value)
-
-      expect(values).toEqual [1]
-      emitter.emit 'a', i for i in [1..5]
-      expect(values).toEqual [1, 2, 4, 7, 11, 16]
-
-  describe "::diff(initialValue, fn)", ->
-    it "returns a behavior yielding the result of the function for previous and new value of the observable", ->
-      values = []
-      behavior = behavior.diff 0, (oldValue, newValue) -> oldValue + newValue
-      behavior.onValue (value) -> values.push(value)
-
-      expect(values).toEqual [1]
-      emitter.emit 'a', i for i in [1..5]
-      expect(values).toEqual [1, 2, 3, 5, 7, 9]
-
-  describe "::distinctUntilChanged()", ->
-    it "returns a signal that yields a value only when the source signal emits a different value from the previous", ->
-      values = []
-      behavior.distinctUntilChanged().onValue (v) -> values.push(v)
-
-      expect(values).toEqual [1]
-      emitter.emit('a', 1)
-      emitter.emit('a', 1)
-      expect(values).toEqual [1]
-      emitter.emit('a', 2)
-      emitter.emit('a', 2)
-      expect(values).toEqual [1, 2]
 
   describe "::filter(predicate)", ->
     it "returns a new behavior that only changes to values matching the given predicate", ->
@@ -97,3 +45,50 @@ describe "Behavior", ->
       expect(values).toEqual [3]
       emitter.emit('a', i) for i in [0..10]
       expect(values).toEqual [3].concat([2..12])
+
+  describe "::scan(initialValue, fn)", ->
+    it "returns a behavior yielding the given initial value, then a new value produced by calling the given function with the previous and new values for every change", ->
+      values = []
+      behavior = behavior.scan 0, (oldValue, newValue) -> oldValue + newValue
+      behavior.onValue (value) -> values.push(value)
+
+      expect(values).toEqual [1]
+      emitter.emit 'a', i for i in [1..5]
+      expect(values).toEqual [1, 2, 4, 7, 11, 16]
+
+  describe "::diff(initialValue, fn)", ->
+    it "returns a behavior yielding the result of the function for previous and new value of the signal", ->
+      values = []
+      behavior = behavior.diff 0, (oldValue, newValue) -> oldValue + newValue
+      behavior.onValue (value) -> values.push(value)
+
+      expect(values).toEqual [1]
+      emitter.emit 'a', i for i in [1..5]
+      expect(values).toEqual [1, 2, 3, 5, 7, 9]
+
+  describe "::distinctUntilChanged()", ->
+    it "returns a signal that yields a value only when the source signal emits a different value from the previous", ->
+      values = []
+      behavior.distinctUntilChanged().onValue (v) -> values.push(v)
+
+      expect(values).toEqual [1]
+      emitter.emit('a', 1)
+      emitter.emit('a', 1)
+      expect(values).toEqual [1]
+      emitter.emit('a', 2)
+      emitter.emit('a', 2)
+      expect(values).toEqual [1, 2]
+
+  describe "::becomes(value)", ->
+    it "emits true when the behavior's value changes to the given value from another value, and false when it changes in the other direction", ->
+      behavior.becomes(5).onValue handler = jasmine.createSpy("handler")
+      expect(handler).not.toHaveBeenCalled()
+      emitter.emit 'a', 4
+      expect(handler).not.toHaveBeenCalled()
+      emitter.emit 'a', 5
+      expect(handler).toHaveBeenCalledWith(true)
+      handler.reset()
+      emitter.emit 'a', 5
+      expect(handler).not.toHaveBeenCalled()
+      emitter.emit 'a', 10
+      expect(handler).toHaveBeenCalledWith(false)

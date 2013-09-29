@@ -16,6 +16,28 @@ describe "Signal", ->
       emitter.emit 'a', 44
       expect(handler).toHaveBeenCalledWith(44)
 
+  describe "::changes()", ->
+    it "returns itself, because a signal is already a stream of changes only (not a behavior)", ->
+      expect(signal.changes()).toBe signal
+
+  describe "::filter(predicate)", ->
+    it "returns a new signal that only emits values matching the given predicate", ->
+      values = []
+      signal.filter((value) -> value > 5).onValue (v) -> values.push(v)
+
+      expect(values).toEqual []
+      emitter.emit('a', i) for i in [0..10]
+      expect(values).toEqual [6..10]
+
+  describe "::map(fn)", ->
+    it "returns a new signal that emits events that are transformed by the given function", ->
+      values = []
+      signal.map((value) -> value + 2).onValue (v) -> values.push(v)
+
+      expect(values).toEqual []
+      emitter.emit('a', i) for i in [0..10]
+      expect(values).toEqual [2..12]
+
   describe "::scan(initialValue, fn)", ->
     it "returns a behavior yielding the given initial value, then a new value produced by calling the given function with the previous and new values for every change", ->
       values = []
@@ -27,7 +49,7 @@ describe "Signal", ->
       expect(values).toEqual [0, 1, 3, 6, 10, 15]
 
   describe "::diff(initialValue, fn)", ->
-    it "returns a behavior yielding the result of the function for previous and new value of the observable", ->
+    it "returns a behavior yielding the result of the function for previous and new value of the signal", ->
       values = []
       behavior = signal.diff 0, (oldValue, newValue) -> oldValue + newValue
       behavior.onValue (value) -> values.push(value)
@@ -48,24 +70,6 @@ describe "Signal", ->
       emitter.emit('a', 2)
       emitter.emit('a', 2)
       expect(values).toEqual [1, 2]
-
-  describe "::filter(predicate)", ->
-    it "returns a new signal that only emits values matching the given predicate", ->
-      values = []
-      signal.filter((value) -> value > 5).onValue (v) -> values.push(v)
-
-      expect(values).toEqual []
-      emitter.emit('a', i) for i in [0..10]
-      expect(values).toEqual [6..10]
-
-  describe "::map(fn)", ->
-    it "returns a new signal that emits events that are transformed by the given function", ->
-      values = []
-      signal.map((value) -> value + 2).onValue (v) -> values.push(v)
-
-      expect(values).toEqual []
-      emitter.emit('a', i) for i in [0..10]
-      expect(values).toEqual [2..12]
 
   describe "::becomes(value)", ->
     it "emits true when the behavior's value changes to the given value from another value, and false when it changes in the other direction", ->
