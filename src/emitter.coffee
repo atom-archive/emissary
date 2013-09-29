@@ -34,6 +34,9 @@ class Emitter extends Mixin
     @signalsByEventName ?= {}
     @signalsByEventName[eventName] ?= Signal.fromEmitter(this, eventName)
 
+  behavior: (eventName, initialValue) ->
+    @signal(eventName).toBehavior(initialValue)
+
   emit: (eventName, args...) ->
     if @queuedEvents
       @queuedEvents.push [eventName, args...]

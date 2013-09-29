@@ -264,12 +264,25 @@ describe "Emitter", ->
 
   describe "::signal(eventName)", ->
     it "returns a signal that yields a value whenever an event by the given name is emitted", ->
-      signal = emitter.signal('a')
-      signal.on 'value', handler = jasmine.createSpy("handler")
-
+      values = []
+      emitter.signal('a').on 'value', (v) -> values.push(v)
+      expect(values).toEqual []
       emitter.emit('a', 'hello')
-      expect(handler).toHaveBeenCalledWith('hello')
-      handler.reset()
-
       emitter.emit('a', 'goodbye')
-      expect(handler).toHaveBeenCalledWith('goodbye')
+      expect(values).toEqual ['hello', 'goodbye']
+
+  describe "::behavior(eventName, initialValue)", ->
+    it "returns a behavior based on events of the given name, assigning the given initial value if a behavior for that event does not already exist", ->
+      values = []
+      emitter.behavior('a', 'hello').on 'value', (v) -> values.push(v)
+      expect(values).toEqual ['hello']
+      emitter.emit('a', 'goodbye')
+
+      # new behaviors can use a different initial value
+      values2 = []
+      emitter.behavior('a', 'no, stay!').on 'value', (v) -> values2.push(v)
+      expect(values2).toEqual ['no, stay!']
+
+      emitter.emit('a', 'good riddance!')
+      expect(values).toEqual ['hello', 'goodbye', 'good riddance!']
+      expect(values2).toEqual ['no, stay!', 'good riddance!']
