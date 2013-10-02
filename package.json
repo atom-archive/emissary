@@ -4,7 +4,8 @@
   "description": "Utility mixins for subscribing to and emitting events.",
   "main": "lib/emissary.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "prepublish": "grunt clean lint coffee"
   },
   "repository": {
     "type": "git",
