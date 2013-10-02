@@ -1,4 +1,4 @@
-# Emissary – Mixins for Events
+# Emissary – Mixins for Events [![Build Status](https://travis-ci.org/atom/emissary.png)](https://travis-ci.org/atom/emissary)
 
 **Achtung!** The Subscriber mixin requires ES6 Harmony WeakMaps. To enable them, run your program with the  `node --harmony_collections` flag. If you're using it in a node framework such as jasmine, run its script with the flag enabled as follows: `node --harmony-collections .bin/jasmine-node specs`.
 
