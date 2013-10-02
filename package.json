@@ -13,6 +13,7 @@
   "bugs": {
     "url": "https://github.com/atom/emissary/issues"
   },
+  "homepage": "http://atom.github.io/emissary",
   "keywords": [
     "event-emitter",
     "events",
