@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>emissary by atom</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>emissary</h1>
+        <p>Node mixins for subscribing to and emitting events</p>
+
+        <p class="view"><a href="https://github.com/atom/emissary">View the Project on GitHub <small>atom/emissary</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/atom/emissary/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/atom/emissary/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/atom/emissary">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="emissary--mixins-for-events-" class="anchor" href="#emissary--mixins-for-events-"><span class="octicon octicon-link"></span></a>Emissary – Mixins for Events <a href="https://travis-ci.org/atom/emissary"><img src="https://travis-ci.org/atom/emissary.png" alt="Build Status"></a>
+</h1>
+
+<p><strong>Achtung!</strong> The Subscriber mixin requires ES6 Harmony WeakMaps. To enable them, run your program with the  <code>node --harmony_collections</code> flag. If you're using it in a node framework such as jasmine, run its script with the flag enabled as follows: <code>node --harmony-collections .bin/jasmine-node specs</code>.</p>
+
+<h2>
+<a name="emitter" class="anchor" href="#emitter"><span class="octicon octicon-link"></span></a>Emitter</h2>
+
+<p>Emitter is backward-compatible with Node's event emitter, but offers more functionality. You can construct standalone <code>Emitter</code> instances or use it as a mixin.</p>
+
+<ul>
+<li><p><code>Emitter.extend(object)</code>
+Turns the given object into an emitter by adding the appropriate methods.</p></li>
+<li><p><code>Emitter.includeInto(class)</code>
+Turns the class into an emitter by extending its prototype.</p></li>
+<li><p><code>::on(eventNames, handler)</code>
+Subscribe to one or more events. Events names are separated by spaces, and can optionally be namespaced with a dot-suffix. E.g. <code>event1 event2.namespace</code>.</p></li>
+<li><p><code>::once(eventName, handler)</code>
+Like <code>::on</code>, but only fires the handler once before unsubscribing automatically.</p></li>
+<li><p><code>::off(eventNames[, handler])</code>
+Unsubscribe to one or more events. Event names are separated by spaces. Passing a non-namespaced event name unsubscribes from every namespace for that event. Passing only a namespace unsubscribes from that entire namespace. Passing a handler removes only a subscription corresponding to the given event name(s) and that handler.</p></li>
+<li><p><code>::emit(eventName[, data...])</code>
+Emit an event with the given name. If the event name is namespaced, only calls handlers for the event associated with the namespace, otherwise it fires all handlers. Handlers are called with zero or more data arguments provided after the event name.</p></li>
+<li><p><code>::pauseEvents()</code>
+Buffers events instead of emitting them until <code>::resumeEvents</code> is called.</p></li>
+<li><p><code>::resumeEvents()</code>
+Emits all events buffered since pausing and resumes normal emitting behavior.</p></li>
+<li><p><code>::getSubscriptionCount()</code>
+Get the total number of handlers registered on the emitter.</p></li>
+</ul><h2>
+<a name="subscriber" class="anchor" href="#subscriber"><span class="octicon octicon-link"></span></a>Subscriber</h2>
+
+<p>Subscriber works in partnership with an emitter or any object supporting subscription cancellation with <code>.off</code>. This includes standard Node event emitters and jQuery objects.</p>
+
+<ul>
+<li><p><code>::subscribe(object, eventNames, handler)</code>
+Subscribe to the given event name(s) on the given object.</p></li>
+<li><p><code>::subscribeWith(object, methodName, eventNames, handler)</code>
+Subscribe to the given object with a method other than <code>.on</code>.</p></li>
+<li><p><code>::unsubscribe([object])</code>
+Cancel subscriptions previously registered with <code>::subscribe</code>. If an object is given, only unsubscribe from that object. If called without an object, unsubscribe from everything.</p></li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/atom">atom</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
