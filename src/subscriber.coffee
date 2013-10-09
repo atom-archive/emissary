@@ -1,4 +1,4 @@
-Mixin = require './mixin'
+Mixin = require 'mixto'
 
 module.exports =
 class Subscriber extends Mixin

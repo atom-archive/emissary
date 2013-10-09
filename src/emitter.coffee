@@ -1,4 +1,4 @@
-Mixin = require './mixin'
+Mixin = require 'mixto'
 Signal = null # required below to avoid circularity
 
 module.exports =
