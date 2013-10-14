@@ -1,6 +1,8 @@
 Mixin = require 'mixto'
 Signal = null # required below to avoid circularity
 
+subscriptionRemovedPattern = /^(last-)?.+-subscription-removed$/
+
 module.exports =
 class Emitter extends Mixin
   on: (eventNames, handler) ->
@@ -81,6 +83,11 @@ class Emitter extends Mixin
               @emit "last-#{eventName}-subscription-removed", handler
               delete @eventHandlersByEventName[eventName]
     else
+      # First remove handlers that aren't for subscription removed events
+      for eventName of @eventHandlersByEventName
+        @off(eventName) unless subscriptionRemovedPattern.test(eventName)
+
+      # Then remove all remaining handlers
       for eventName of @eventHandlersByEventName
         @off(eventName)
 

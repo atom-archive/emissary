@@ -110,6 +110,15 @@ describe "Emitter", ->
         ['last-foo-subscription-removed', fooHandler2]
       ]
 
+      events = []
+      emitter.on 'foo', fooHandler1
+      emitter.off()
+
+      expect(events).toEqual [
+        ['foo-subscription-removed', fooHandler1]
+        ['last-foo-subscription-removed', fooHandler1]
+      ]
+
   describe "::off", ->
     describe "when called with no arguments", ->
       it "removes all subscriptions", ->
