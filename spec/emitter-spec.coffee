@@ -122,10 +122,15 @@ describe "Emitter", ->
   describe "::off", ->
     describe "when called with no arguments", ->
       it "removes all subscriptions", ->
+        namespaceHandler = jasmine.createSpy('namespaceHandler')
+        emitter.on 'foo.me', namespaceHandler
         emitter.off()
         emitter.emit 'foo'
         expect(fooHandler1).not.toHaveBeenCalled()
         expect(fooHandler2).not.toHaveBeenCalled()
+        expect(namespaceHandler).not.toHaveBeenCalled()
+        expect(emitter.eventHandlersByEventName).toEqual {}
+        expect(emitter.eventHandlersByNamespace).toEqual {}
 
     describe "when called with multiple space-separated event names", ->
       it "unsubscribes from each event name", ->

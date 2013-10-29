@@ -94,6 +94,8 @@ class Emitter extends Mixin
       for eventName of @eventHandlersByEventName
         @off(eventName)
 
+      @eventHandlersByNamespace = {}
+
   pauseEvents: (eventNames) ->
     if eventNames
       for eventName in eventNames.split(/\s+/) when eventName isnt ''
