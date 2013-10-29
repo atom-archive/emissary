@@ -244,6 +244,58 @@ describe "Emitter", ->
       emitter.emit('event')
       expect(onceHandler).not.toHaveBeenCalled()
 
+  describe "::pauseEvents", ->
+    describe "when not passed an event name", ->
+      it "pauses all events until ::resumeEvents is called", ->
+        emitter.pauseEvents()
+        emitter.on 'baz', bazHandler = jasmine.createSpy("bazHandler")
+
+        emitter.emit('foo', 1)
+        emitter.emit('bar', 2)
+        emitter.emit('baz', 3)
+
+        expect(fooHandler1).not.toHaveBeenCalled()
+        expect(fooHandler2).not.toHaveBeenCalled()
+        expect(barHandler).not.toHaveBeenCalled()
+        expect(bazHandler).not.toHaveBeenCalled()
+
+        emitter.resumeEvents()
+        expect(fooHandler1).toHaveBeenCalledWith(1)
+        expect(fooHandler2).toHaveBeenCalledWith(1)
+        expect(barHandler).toHaveBeenCalledWith(2)
+        expect(bazHandler).toHaveBeenCalledWith(3)
+
+        emitter.emit('foo', 4)
+        expect(fooHandler1).toHaveBeenCalledWith(4)
+        expect(fooHandler2).toHaveBeenCalledWith(4)
+
+    describe "when passed an event name", ->
+      it "pauses events by the given name until ::resumeEvents is called", ->
+        emitter.pauseEvents('foo')
+        emitter.pauseEvents('bar')
+        emitter.on 'baz', bazHandler = jasmine.createSpy("bazHandler")
+
+        emitter.emit('foo', 1)
+        emitter.emit('bar', 2)
+        emitter.emit('baz', 3)
+
+        expect(fooHandler1).not.toHaveBeenCalled()
+        expect(fooHandler2).not.toHaveBeenCalled()
+        expect(barHandler).not.toHaveBeenCalled()
+        expect(bazHandler).toHaveBeenCalledWith(3)
+
+        emitter.resumeEvents('foo')
+        expect(fooHandler1).toHaveBeenCalledWith(1)
+        expect(fooHandler2).toHaveBeenCalledWith(1)
+
+        emitter.emit('foo', 4)
+        expect(fooHandler1).toHaveBeenCalledWith(4)
+        expect(fooHandler2).toHaveBeenCalledWith(4)
+
+        emitter.resumeEvents()
+        expect(barHandler).toHaveBeenCalledWith(2)
+
+
   describe "::getSubscriptionCount()", ->
     describe "when not passed an event name", ->
       it "returns the total number of subscriptions on the emitter", ->

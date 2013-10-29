@@ -40,16 +40,19 @@ class Emitter extends Mixin
     @signal(eventName).toBehavior(initialValue)
 
   emit: (eventName, args...) ->
-    if @queuedEvents
-      @queuedEvents.push [eventName, args...]
+    if @globalQueuedEvents
+      @globalQueuedEvents.push [eventName, args...]
     else
       [eventName, namespace] = eventName.split('.')
-
       if namespace
-        if handlers = @eventHandlersByNamespace?[namespace]?[eventName]
+        if queuedEvents = @queuedEventsByEventName?[eventName]
+          queuedEvents.push(["#{eventName}.#{namespace}", args...])
+        else if handlers = @eventHandlersByNamespace?[namespace]?[eventName]
           new Array(handlers...).forEach (handler) -> handler(args...)
       else
-        if handlers = @eventHandlersByEventName?[eventName]
+        if queuedEvents = @queuedEventsByEventName?[eventName]
+          queuedEvents.push([eventName, args...])
+        else if handlers = @eventHandlersByEventName?[eventName]
           new Array(handlers...).forEach (handler) -> handler(args...)
 
   off: (eventNames, handler) ->
@@ -91,16 +94,33 @@ class Emitter extends Mixin
       for eventName of @eventHandlersByEventName
         @off(eventName)
 
-  pauseEvents: ->
-    @pauseCount ?= 0
-    if @pauseCount++ == 0
-      @queuedEvents ?= []
+  pauseEvents: (eventNames) ->
+    if eventNames
+      for eventName in eventNames.split(/\s+/) when eventName isnt ''
+        @pauseCountsByEventName ?= {}
+        @queuedEventsByEventName ?= {}
+        @pauseCountsByEventName[eventName] ?= 0
+        @pauseCountsByEventName[eventName]++
+        @queuedEventsByEventName[eventName] ?= []
+    else
+      @globalPauseCount ?= 0
+      @globalQueuedEvents ?= []
+      @globalPauseCount++
 
-  resumeEvents: ->
-    if --@pauseCount == 0
-      queuedEvents = @queuedEvents
-      @queuedEvents = null
-      @emit(event...) for event in queuedEvents
+  resumeEvents: (eventNames) ->
+    if eventNames
+      for eventName in eventNames.split(/\s+/) when eventName isnt ''
+        if @pauseCountsByEventName?[eventName] > 0 and --@pauseCountsByEventName[eventName] is 0
+          queuedEvents = @queuedEventsByEventName[eventName]
+          @queuedEventsByEventName[eventName] = null
+          @emit(event...) for event in queuedEvents
+    else
+      for eventName of @pauseCountsByEventName
+        @resumeEvents(eventName)
+      if @globalPauseCount > 0 and --@globalPauseCount == 0
+        queuedEvents = @globalQueuedEvents
+        @globalQueuedEvents = null
+        @emit(event...) for event in queuedEvents
 
   getSubscriptionCount: (eventName) ->
     if eventName?
