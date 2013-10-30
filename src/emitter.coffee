@@ -64,14 +64,24 @@ class Emitter extends Mixin
         if namespace
           if eventName
             handlers = @eventHandlersByNamespace?[namespace]?[eventName] ? []
-            for handler in new Array(handlers...)
+            if handler?
               removeFromArray(handlers, handler)
               @off eventName, handler
-          else
-            for eventName, handlers of @eventHandlersByNamespace?[namespace] ? {}
+            else
               for handler in new Array(handlers...)
                 removeFromArray(handlers, handler)
                 @off eventName, handler
+          else
+            namespaceHandlers = @eventHandlersByNamespace?[namespace] ? {}
+            if handler?
+              for eventName, handlers of namespaceHandlers
+                removeFromArray(handlers, handler)
+                @off eventName, handler
+            else
+              for eventName, handlers of namespaceHandlers
+                for handler in new Array(handlers...)
+                  removeFromArray(handlers, handler)
+                  @off eventName, handler
         else
           eventHandlers = @eventHandlersByEventName?[eventName]
           return unless eventHandlers?

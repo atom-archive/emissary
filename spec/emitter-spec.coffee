@@ -179,6 +179,26 @@ describe "Emitter", ->
         emitter.on 'baz.ns1', bazHandler2
         emitter.on 'baz.ns2', bazHandler3
 
+      describe "when called with a namespaced event name and handler", ->
+        it "removes the subscription for that specific handler", ->
+          emitter.off 'baz.ns1', bazHandler1
+          emitter.emit 'baz'
+
+          expect(bazHandler1).not.toHaveBeenCalled()
+          expect(bazHandler2).toHaveBeenCalled()
+          expect(bazHandler3).toHaveBeenCalled()
+
+      describe "when called with a namespace and handler", ->
+        it "removes the subscription for that specific handler", ->
+          emitter.on 'bat.ns1', bazHandler1
+          emitter.off '.ns1', bazHandler1
+          emitter.emit 'baz'
+          emitter.emit 'bat'
+
+          expect(bazHandler1).not.toHaveBeenCalled()
+          expect(bazHandler2).toHaveBeenCalled()
+          expect(bazHandler3).toHaveBeenCalled()
+
       describe "when called with a namespaced event name", ->
         it "removes all subscriptions in that namespace", ->
           emitter.emit 'baz'
