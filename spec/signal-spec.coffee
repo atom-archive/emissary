@@ -16,6 +16,11 @@ describe "Signal", ->
       emitter.emit 'a', 44
       expect(handler).toHaveBeenCalledWith(44)
 
+    it "can take undefined as the behavior's initial value", ->
+      behavior = signal.toBehavior(undefined)
+      behavior.onValue(handler = jasmine.createSpy("handler"))
+      expect(handler).toHaveBeenCalledWith(undefined)
+
   describe "::changes()", ->
     it "returns itself, because a signal is already a stream of changes only (not a behavior)", ->
       expect(signal.changes()).toBe signal

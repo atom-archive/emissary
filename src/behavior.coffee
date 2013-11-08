@@ -4,7 +4,7 @@ Signal = require './signal'
 module.exports =
 class Behavior extends Signal
   constructor: (args...) ->
-    initialValue = args.shift() if typeof args[0].call isnt 'function'
+    initialValue = args.shift() if typeof args[0]?.call isnt 'function'
     subscribe = args.shift()
 
     latestValue = initialValue
