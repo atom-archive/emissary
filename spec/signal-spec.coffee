@@ -25,6 +25,18 @@ describe "Signal", ->
     it "returns itself, because a signal is already a stream of changes only (not a behavior)", ->
       expect(signal.changes()).toBe signal
 
+  describe "::injectMetadata(fn)", ->
+    it "allows a metadata value to be injected for the given event", ->
+      values = []
+      metadata = []
+      signal.injectMetadata((value) -> {value}).onValue (v, m) ->
+        values.push(v)
+        metadata.push(m)
+
+      emitter.emit('a', 4)
+      expect(values).toEqual [4]
+      expect(metadata).toEqual [{value: 4}]
+
   describe "::filter(predicate)", ->
     it "returns a new signal that only emits values matching the given predicate", ->
       values = []

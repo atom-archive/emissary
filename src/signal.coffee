@@ -28,6 +28,13 @@ class Signal
   changes: ->
     this
 
+  injectMetadata: (fn) ->
+    source = this
+    new @constructor ->
+      @subscribe source, 'value', (value, metadata...) =>
+        metadata = fn(value, metadata...)
+        @emit 'value', value, metadata
+
   filter: (predicate) ->
     source = this
     new @constructor ->
