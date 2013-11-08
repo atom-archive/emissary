@@ -14,16 +14,16 @@ class Signal
 
   @fromEmitter: (emitter, eventName) ->
     new Signal ->
-      @subscribe emitter, eventName, (event) =>
-        @emit 'value', event
+      @subscribe emitter, eventName, (value, metadata...) =>
+        @emit 'value', value, metadata...
 
   onValue: (handler) -> @on 'value', handler
 
   toBehavior: (initialValue) ->
     source = this
     @buildBehavior initialValue, ->
-      @subscribe source, 'value', (value) =>
-        @emit 'value', value
+      @subscribe source, 'value', (value, metadata...) =>
+        @emit 'value', value, metadata...
 
   changes: ->
     this
@@ -31,8 +31,9 @@ class Signal
   filter: (predicate) ->
     source = this
     new @constructor ->
-      @subscribe source, 'value', (value) =>
-        @emit 'value', value if predicate.call(value, value)
+      @subscribe source, 'value', (value, metadata...) =>
+        if predicate.call(value, value)
+          @emit 'value', value, metadata...
 
   filterDefined: ->
     @filter (value) -> value?
@@ -40,8 +41,8 @@ class Signal
   map: (fn) ->
     source = this
     new @constructor ->
-      @subscribe source, 'value', (value) =>
-        @emit 'value', fn(value)
+      @subscribe source, 'value', (value, metadata...) =>
+        @emit 'value', fn(value), metadata...
 
   skipUntil: (predicateOrTargetValue) ->
     unless typeof predicateOrTargetValue is 'function'
@@ -61,34 +62,34 @@ class Signal
     source = this
     @buildBehavior initialValue, ->
       oldValue = initialValue
-      @subscribe source, 'value', (newValue) =>
-        @emit 'value', oldValue = fn(oldValue, newValue)
+      @subscribe source, 'value', (newValue, metadata...) =>
+        @emit 'value', (oldValue = fn(oldValue, newValue)), metadata...
 
   diff: (initialValue, fn) ->
     source = this
     @buildBehavior ->
       oldValue = initialValue
-      @subscribe source, 'value', (newValue) =>
+      @subscribe source, 'value', (newValue, metadata...) =>
         fnOldValue = oldValue
         oldValue = newValue
-        @emit 'value', fn(fnOldValue, newValue)
+        @emit 'value', fn(fnOldValue, newValue), metadata...
 
   distinctUntilChanged: ->
     source = this
     new @constructor ->
       receivedValue = false
       oldValue = undefined
-      @subscribe source, 'value', (newValue) =>
+      @subscribe source, 'value', (newValue, metadata...) =>
         if receivedValue
           if isEqual(oldValue, newValue)
             oldValue = newValue
           else
             oldValue = newValue
-            @emit 'value', newValue
+            @emit 'value', newValue, metadata...
         else
           receivedValue = true
           oldValue = newValue
-          @emit 'value', newValue
+          @emit 'value', newValue, metadata...
 
   # Private: Builds a Behavior instance, lazily requiring the Behavior subclass
   # to avoid circular require.
