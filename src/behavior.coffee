@@ -4,7 +4,7 @@ Signal = require './signal'
 module.exports =
 class Behavior extends Signal
   constructor: (args...) ->
-    initialValue = args.shift() if args.length > 1
+    initialValue = args.shift() if typeof args[0].call isnt 'function'
     subscribe = args.shift()
 
     latestValue = initialValue
@@ -13,7 +13,7 @@ class Behavior extends Signal
       unless handlingFirstSubscription
         handlingFirstSubscription = true
         @subscribe this, 'value', (value) => latestValue = value
-        subscribe.call(this)
+        subscribe?.call(this)
         handlingFirstSubscription = false
 
     @on 'value-subscription-removed', =>
