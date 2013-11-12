@@ -10,13 +10,13 @@ class Behavior extends Signal
     latestValue = initialValue
 
     @on 'value-subscription-removed', =>
-      @unsubscribe() if @getSubscriptionCount('value') is 1 # our self-subscription above doesn't count
+      @unsubscribe() if @getSubscriptionCount('value') is 1 # our self-subscription below doesn't count
 
     super
       beforeFirstSubscription: ->
         @subscribe this, 'value', (value) => latestValue = value
         subscribe?.call(this)
-      onEachSubscription: (handler) ->
+      afterEachSubscription: (handler) ->
         handler(latestValue)
 
   toBehavior: ->
