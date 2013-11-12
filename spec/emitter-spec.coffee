@@ -71,6 +71,17 @@ describe "Emitter", ->
         emitter.emit 'b'
         expect(events).toEqual [2, 1]
 
+    it "returns an object with an off() method that removes the handler when called", ->
+      events = []
+      subscription = emitter.on 'b', (event) -> events.push(event)
+
+      emitter.emit 'b', 'b1'
+      expect(events).toEqual ['b1']
+
+      subscription.off()
+      emitter.emit 'b', 'b2'
+      expect(events).toEqual ['b1']
+
   describe "::emit", ->
     describe "when called with a non-namespaced event name", ->
       it "calls all handlers that are subscribed to the given event name with the given data", ->

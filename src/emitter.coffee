@@ -33,12 +33,12 @@ class Emitter extends Mixin
 
       @emit "#{eventName}-subscription-added", handler
 
-  once: (eventName, handler) ->
-    oneShotHandler = (args...) =>
-      @off(eventName, oneShotHandler)
-      handler(args...)
+    {emitter: this, off: => @off(eventNames, handler)}
 
-    @on eventName, oneShotHandler
+  once: (eventName, handler) ->
+    subscription = @on eventName, (args...) ->
+      subscription.off()
+      handler(args...)
 
   signal: (eventName) ->
     Signal ?= require './signal'
