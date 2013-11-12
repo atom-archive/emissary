@@ -8,18 +8,8 @@ class Signal
   Emitter.includeInto(this)
   Subscriber.includeInto(this)
 
-  constructor: (subscriptionHandlers) ->
-    if typeof subscriptionHandlers is 'function'
-      subscriptionHandlers = {beforeFirstSubscription: subscriptionHandlers}
-
-    if subscriptionHandlers.beforeFirstSubscription?
-      @on 'first-value-subscription-will-be-added', =>
-        subscriptionHandlers.beforeFirstSubscription.call(this)
-
-    if subscriptionHandlers.afterEachSubscription?
-      @on 'value-subscription-added', (handler) =>
-        subscriptionHandlers.afterEachSubscription.call(this, handler)
-
+  constructor: (subscribe) ->
+    @on 'first-value-subscription-will-be-added', (handler) => subscribe?.call(this)
     @on 'last-value-subscription-removed', => @unsubscribe()
 
   @fromEmitter: (emitter, eventName) ->
