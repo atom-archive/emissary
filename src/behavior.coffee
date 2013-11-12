@@ -10,7 +10,7 @@ class Behavior extends Signal
     @on 'first-value-subscription-will-be-added', =>
       latestValue = initialValue
       @subscribe this, 'value', (value) => latestValue = value
-      @on 'value-subscription-added', (handler) => handler(latestValue)
+      @subscribe this, 'value-subscription-added', (handler) => handler(latestValue)
       subscribe?.call(this)
 
     @on 'value-subscription-removed', =>
