@@ -61,6 +61,16 @@ describe "Emitter", ->
           ['b-subscription-added', handler2]
         ]
 
+      it "does not blow the stack when subscribing from a 'first-{event-name}-subscription-will-be-added event'", ->
+        events = []
+        emitter.on 'first-b-subscription-will-be-added', (handler) ->
+          emitter.on 'b', -> events.push(2)
+
+        emitter.on 'b', -> events.push(1)
+
+        emitter.emit 'b'
+        expect(events).toEqual [2, 1]
+
   describe "::emit", ->
     describe "when called with a non-namespaced event name", ->
       it "calls all handlers that are subscribed to the given event name with the given data", ->

@@ -9,7 +9,7 @@ class Emitter extends Mixin
     for eventName in eventNames.split(/\s+/) when eventName isnt ''
       [eventName, namespace] = eventName.split('.')
 
-      if @getSubscriptionCount(eventName) is 0
+      if @incrementSubscriptionCount(eventName) is 1
         @emit "first-#{eventName}-subscription-will-be-added", handler
 
       @eventHandlersByEventName ?= {}
@@ -91,6 +91,7 @@ class Emitter extends Mixin
             return
 
           if removeFromArray(eventHandlers, handler)
+            @decrementSubscriptionCount(eventName)
             @emit "#{eventName}-subscription-removed", handler
             if @getSubscriptionCount(eventName) is 0
               @emit "last-#{eventName}-subscription-removed", handler
@@ -134,14 +135,25 @@ class Emitter extends Mixin
         @globalQueuedEvents = null
         @emit(event...) for event in queuedEvents
 
+  incrementSubscriptionCount: (eventName) ->
+    @subscriptionCounts ?= {}
+    @subscriptionCounts[eventName] ?= 0
+    ++@subscriptionCounts[eventName]
+
+  decrementSubscriptionCount: (eventName) ->
+    count = --@subscriptionCounts[eventName]
+    if count is 0
+      delete @subscriptionCounts[eventName]
+    count
+
   getSubscriptionCount: (eventName) ->
     if eventName?
-      @eventHandlersByEventName?[eventName]?.length ? 0
+      @subscriptionCounts[eventName] ? 0
     else
-      count = 0
-      for name, handlers of @eventHandlersByEventName ? {}
-        count += handlers.length
-      count
+      total = 0
+      for name, count of @subscriptionCounts
+        total += count
+      total
 
 removeFromArray = (array, element) ->
   index = array.indexOf(element)

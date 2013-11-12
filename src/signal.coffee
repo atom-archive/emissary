@@ -12,13 +12,8 @@ class Signal
     if typeof subscriptions is 'function'
       subscriptions = {beforeFirstSubscription: subscriptions}
 
-    handlingFirstValueSubscription = false
-
     @on 'first-value-subscription-will-be-added', =>
-      unless handlingFirstValueSubscription
-        handlingFirstValueSubscription = true
-        subscriptions.beforeFirstSubscription.call(this)
-        handlingFirstValueSubscription = false
+      subscriptions.beforeFirstSubscription.call(this)
 
     if subscriptions.onEachSubscription?
       @on 'value-subscription-added', (handler) =>
