@@ -5,6 +5,15 @@ subscriptionRemovedPattern = /^(last-)?.+-subscription-removed$/
 
 module.exports =
 class Emitter extends Mixin
+  eventHandlersByEventName: null
+  eventHandlersByNamespace: null
+  subscriptionCounts: null
+  pauseCountsByEventName: null
+  queuedEventsByEventName: null
+  globalPauseCount: null
+  globalQueuedEvents: null
+  signalsByEventName: null
+
   on: (eventNames, handler) ->
     for eventName in eventNames.split(/\s+/) when eventName isnt ''
       [eventName, namespace] = eventName.split('.')
