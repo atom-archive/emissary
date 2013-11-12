@@ -320,7 +320,6 @@ describe "Emitter", ->
         emitter.resumeEvents()
         expect(barHandler).toHaveBeenCalledWith(2)
 
-
   describe "::getSubscriptionCount()", ->
     describe "when not passed an event name", ->
       it "returns the total number of subscriptions on the emitter", ->
