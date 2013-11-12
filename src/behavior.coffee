@@ -7,17 +7,14 @@ class Behavior extends Signal
     initialValue = args.shift() if typeof args[0]?.call isnt 'function'
     subscribe = args.shift()
 
-    latestValue = initialValue
+    @on 'first-value-subscription-will-be-added', =>
+      latestValue = initialValue
+      @subscribe this, 'value', (value) => latestValue = value
+      @on 'value-subscription-added', (handler) => handler(latestValue)
+      subscribe?.call(this)
 
     @on 'value-subscription-removed', =>
-      @unsubscribe() if @getSubscriptionCount('value') is 1 # our self-subscription below doesn't count
-
-    super
-      beforeFirstSubscription: ->
-        @subscribe this, 'value', (value) => latestValue = value
-        subscribe?.call(this)
-      afterEachSubscription: (handler) ->
-        handler(latestValue)
+      @unsubscribe() if @getSubscriptionCount('value') is 1 # our self-subscription to 'value' events above doesn't count
 
   toBehavior: ->
     this
