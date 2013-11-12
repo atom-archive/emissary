@@ -33,3 +33,25 @@ describe "Subscriber", ->
     emitter2.emit 'event2', 'bar'
     expect(event1Handler).not.toHaveBeenCalled()
     expect(event2Handler).toHaveBeenCalledWith('bar')
+
+  it "allows a subscription returned from Emitter::on to be subscribed to", ->
+    events = []
+    subscription1 = emitter1.on 'event1', (event) => events.push(event)
+    subscription2 = emitter2.on 'event2', (event) => events.push(event)
+    subscriber.subscribe(subscription1)
+    subscriber.subscribe(subscription2)
+
+    emitter1.emit 'event1', 'foo'
+    expect(events).toEqual ['foo']
+
+    subscriber.unsubscribe(emitter1)
+    emitter1.emit 'event1', 'bar'
+    expect(events).toEqual ['foo']
+
+    events = []
+    emitter2.emit 'event2', 'foo'
+    expect(events).toEqual ['foo']
+
+    subscriber.unsubscribe()
+    emitter2.emit 'event2', 'bar'
+    expect(events).toEqual ['foo']

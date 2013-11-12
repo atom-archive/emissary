@@ -8,21 +8,34 @@ class Subscriber extends Mixin
 
     eventEmitter[methodName](args...)
 
-    @subscriptions ?= []
-    @subscriptionsByObject ?= new WeakMap
-    @subscriptionsByObject.set(eventEmitter, []) unless @subscriptionsByObject.has(eventEmitter)
-
     eventName = args[0]
     callback = args[args.length - 1]
-    subscription = cancel: ->
-      # node's EventEmitter doesn't have 'off' method.
-      removeListener = eventEmitter.off ? eventEmitter.removeListener
-      removeListener.call eventEmitter, eventName, callback
-    @subscriptions.push(subscription)
-    @subscriptionsByObject.get(eventEmitter).push(subscription)
+    @addSubscription
+      emitter: eventEmitter
+      off: ->
+        # node's EventEmitter doesn't have 'off' method.
+        removeListener = eventEmitter.off ? eventEmitter.removeListener
+        removeListener.call eventEmitter, eventName, callback
 
-  subscribe: (eventEmitter, args...) ->
-    @subscribeWith(eventEmitter, 'on', args)
+  addSubscription: (subscription) ->
+    @subscriptions ?= []
+    @subscriptions.push(subscription)
+
+    {emitter} = subscription
+    if emitter?
+      @subscriptionsByObject ?= new WeakMap
+      if @subscriptionsByObject.has(emitter)
+        @subscriptionsByObject.get(emitter).push(subscription)
+      else
+        @subscriptionsByObject.set(emitter, [subscription])
+
+    subscription
+
+  subscribe: (eventEmitterOrSubscription, args...) ->
+    if args.length is 0
+      @addSubscription(eventEmitterOrSubscription)
+    else
+      @subscribeWith(eventEmitterOrSubscription, 'on', args)
 
   subscribeToCommand: (eventEmitter, args...) ->
     @subscribeWith(eventEmitter, 'command', args)
@@ -30,11 +43,11 @@ class Subscriber extends Mixin
   unsubscribe: (object) ->
     if object?
       for subscription in @subscriptionsByObject?.get(object) ? []
-        subscription.cancel()
+        subscription.off()
         index = @subscriptions.indexOf(subscription)
         @subscriptions.splice(index, 1) if index >= 0
       @subscriptionsByObject?.delete(object)
     else
-      subscription.cancel() for subscription in @subscriptions ? []
+      subscription.off() for subscription in @subscriptions ? []
       @subscriptions = null
       @subscriptionsByObject = null
