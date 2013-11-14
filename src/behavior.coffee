@@ -9,12 +9,15 @@ class Behavior extends Signal
 
     @on 'first-value-subscription-will-be-added', =>
       latestValue = initialValue
-      @subscribe this, 'value', (value) => latestValue = value
+      @subscribe this, 'value-internal', (value) => latestValue = value
       @subscribe this, 'value-subscription-added', (handler) => handler(latestValue)
       subscribe?.call(this)
 
-    @on 'value-subscription-removed', =>
-      @unsubscribe() if @getSubscriptionCount('value') is 1 # our self-subscription to 'value' events above doesn't count
+    @on 'last-value-subscription-removed', => @unsubscribe()
+
+  emit: (name, args...) ->
+    @emit('value-internal', args...) if name is 'value'
+    super
 
   toBehavior: ->
     this

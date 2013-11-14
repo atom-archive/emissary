@@ -1,11 +1,13 @@
 Emitter = require '../src/emitter'
 
 describe "Behavior", ->
-  [emitter, behavior] = []
+  [emitter, signal, behavior] = []
 
   beforeEach ->
     emitter = new Emitter
-    behavior = emitter.signal('a').toBehavior(1)
+    signal = emitter.signal('a')
+    behavior = signal.toBehavior(1)
+
   it "calls each subscribing callback with the behavior's current value", ->
     values = []
     behavior.onValue (v) -> values.push(v)
@@ -17,6 +19,23 @@ describe "Behavior", ->
     behavior.onValue (v) -> values2.push(v)
     expect(values2).toEqual [9]
 
+  it "unsubscribes from the underlying signal when there are no more subscribers", ->
+    expect(behavior.getSubscriptionCount('value')).toBe 0
+    expect(signal.getSubscriptionCount('value')).toBe 0
+
+    subscription1 = behavior.onValue ->
+    subscription2 = behavior.onValue ->
+
+    expect(behavior.getSubscriptionCount('value')).toBe 2
+    expect(signal.getSubscriptionCount('value')).toBe 1
+
+    subscription1.off()
+    expect(behavior.getSubscriptionCount('value')).toBe 1
+    expect(signal.getSubscriptionCount('value')).toBe 1
+
+    subscription2.off()
+    expect(behavior.getSubscriptionCount('value')).toBe 0
+    expect(signal.getSubscriptionCount('value')).toBe 0
 
   describe "::toBehavior()", ->
     it "returns itself because it's already a behavior", ->

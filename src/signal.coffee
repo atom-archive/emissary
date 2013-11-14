@@ -4,8 +4,7 @@ Subscriber = require './subscriber'
 Behavior = null
 
 module.exports =
-class Signal
-  Emitter.includeInto(this)
+class Signal extends Emitter
   Subscriber.includeInto(this)
 
   constructor: (subscribe) ->
