@@ -6,6 +6,17 @@ describe "Behavior", ->
   beforeEach ->
     emitter = new Emitter
     behavior = emitter.signal('a').toBehavior(1)
+  it "calls each subscribing callback with the behavior's current value", ->
+    values = []
+    behavior.onValue (v) -> values.push(v)
+    expect(values).toEqual [1]
+    emitter.emit 'a', 9
+    expect(values).toEqual [1, 9]
+
+    values2 = []
+    behavior.onValue (v) -> values2.push(v)
+    expect(values2).toEqual [9]
+
 
   describe "::toBehavior()", ->
     it "returns itself because it's already a behavior", ->
