@@ -368,6 +368,20 @@ describe "Emitter", ->
         emitter.off 'baz', handler1
         expect(emitter.getSubscriptionCount('baz')).toBe 0
 
+  describe "::hasSubscriptions()", ->
+    describe "when not passed an event name", ->
+      it "returns true if the subscription count is greater than zero", ->
+        expect(emitter.hasSubscriptions()).toBe true
+        emitter.off()
+        expect(emitter.hasSubscriptions()).toBe false
+
+    describe "when passed an event name", ->
+      it "returns true if the subscription count is greater than zero", ->
+        expect(emitter.hasSubscriptions('baz')).toBe false
+
+        emitter.on 'baz', handler1 = ->
+        expect(emitter.hasSubscriptions('baz')).toBe true
+
   describe "::signal(eventName)", ->
     it "returns a signal that yields a value whenever an event by the given name is emitted", ->
       values = []

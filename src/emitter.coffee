@@ -164,6 +164,9 @@ class Emitter extends Mixin
         total += count
       total
 
+  hasSubscriptions: (eventName) ->
+    @getSubscriptionCount(eventName) > 0
+
 removeFromArray = (array, element) ->
   index = array.indexOf(element)
   if index > -1
