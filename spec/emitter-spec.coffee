@@ -368,6 +368,11 @@ describe "Emitter", ->
         emitter.off 'baz', handler1
         expect(emitter.getSubscriptionCount('baz')).toBe 0
 
+    it "does not throw an exception when called on an emitter on which `on` has never been called", ->
+      emitter = new Emitter
+      expect(emitter.getSubscriptionCount()).toBe 0
+      expect(emitter.getSubscriptionCount('foo')).toBe 0
+
   describe "::hasSubscriptions()", ->
     describe "when not passed an event name", ->
       it "returns true if the subscription count is greater than zero", ->

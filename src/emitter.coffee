@@ -157,7 +157,7 @@ class Emitter extends Mixin
 
   getSubscriptionCount: (eventName) ->
     if eventName?
-      @subscriptionCounts[eventName] ? 0
+      @subscriptionCounts?[eventName] ? 0
     else
       total = 0
       for name, count of @subscriptionCounts
