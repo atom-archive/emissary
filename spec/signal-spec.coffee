@@ -101,6 +101,11 @@ describe "Signal", ->
       expect(values).toEqual ['a', 'b', 'c', 'd', 'e']
       expect(metadata).toEqual [1, 2, 3, 4, 5]
 
+      signal.emitValue(null)
+      expect(subsignal3.getSubscriptionCount('value')).toBe 0
+      expect(values).toEqual ['a', 'b', 'c', 'd', 'e']
+      expect(metadata).toEqual [1, 2, 3, 4, 5]
+
   describe "::skipUntil(valueOrPredicate)", ->
     describe "when passed a value", ->
       it "skips all values until encountering a value that matches the target value", ->

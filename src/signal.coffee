@@ -76,8 +76,9 @@ class Signal extends Emitter
       @subscribe source, 'value', (newSignal) =>
         @unsubscribe(currentSignal) if currentSignal?
         currentSignal = newSignal
-        @subscribe newSignal, 'value', (value, metadata) =>
-          @emitValue(value, metadata)
+        if currentSignal?
+          @subscribe currentSignal, 'value', (value, metadata) =>
+            @emitValue(value, metadata)
 
   skipUntil: (predicateOrTargetValue) ->
     unless typeof predicateOrTargetValue is 'function'
