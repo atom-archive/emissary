@@ -4,20 +4,21 @@ Signal = require './signal'
 module.exports =
 class Behavior extends Signal
   constructor: (args...) ->
-    initialValue = args.shift() if typeof args[0]?.call isnt 'function'
-    subscribe = args.shift()
+    @value = args.shift() if typeof args[0]?.call isnt 'function'
+    super(subscribeCallback = args.shift())
 
-    @on 'first-value-subscription-will-be-added', =>
-      latestValue = initialValue
-      @subscribe this, 'value-internal', (value) => latestValue = value
-      @subscribe this, 'value-subscription-added', (handler) => handler(latestValue)
-      subscribe?.call(this)
-
-    @on 'last-value-subscription-removed', => @unsubscribe()
+  retained: ->
+    @subscribe this, 'value-internal', (value) => @value = value
+    @subscribe this, 'value-subscription-added', (handler) => handler(@value)
+    @subscribeCallback?()
 
   emit: (name, args...) ->
     @emit('value-internal', args...) if name is 'value'
     super
+
+  getValue: ->
+    throw new Error("Subscribe to or retain this behavior before calling getValue") unless @retainCount > 0
+    @value
 
   toBehavior: ->
     this

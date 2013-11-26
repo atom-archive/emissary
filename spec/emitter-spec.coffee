@@ -34,18 +34,31 @@ describe "Emitter", ->
         emitter.emit ''
         expect(handler).not.toHaveBeenCalled()
 
-      it "emits a '{event-name}-subscription-added' event with the given handler for each named event", ->
-        emitter.on 'a-subscription-added', aSubscriptionHandler = jasmine.createSpy("aSubscriptionHandler")
-        emitter.on 'b-subscription-added', bSubscriptionHandler = jasmine.createSpy("bSubscriptionHandler")
-        emitter.on 'c-subscription-added', cSubscriptionHandler = jasmine.createSpy("cSubscriptionHandler")
-        emitter.on 'e-subscription-added', eSubscriptionHandler = jasmine.createSpy("eSubscriptionHandler")
+      it "emits a '{event-name}-subscription-[will-be]-added' event with the given handler for each named event", ->
+        events = []
+        emitter.on 'a-subscription-will-be-added', ->
+          expect(emitter.getSubscriptionCount('a')).toBe 0
+          events.push ('before-a')
+        emitter.on 'b-subscription-will-be-added', ->
+          expect(emitter.getSubscriptionCount('b')).toBe 0
+          events.push ('before-b')
+        emitter.on 'c-subscription-will-be-added', ->
+          expect(emitter.getSubscriptionCount('c')).toBe 0
+          events.push ('before-c')
 
-        emitter.on 'a.b c.d e', handler = ->
+        emitter.on 'a-subscription-added', ->
+          expect(emitter.getSubscriptionCount('a')).toBe 1
+          events.push('after-a')
+        emitter.on 'b-subscription-added', ->
+          expect(emitter.getSubscriptionCount('b')).toBe 1
+          events.push ('after-b')
+        emitter.on 'c-subscription-added', ->
+          expect(emitter.getSubscriptionCount('c')).toBe 1
+          events.push ('after-c')
 
-        expect(aSubscriptionHandler).toHaveBeenCalledWith(handler)
-        expect(cSubscriptionHandler).toHaveBeenCalledWith(handler)
-        expect(eSubscriptionHandler).toHaveBeenCalledWith(handler)
-        expect(bSubscriptionHandler).not.toHaveBeenCalled()
+        emitter.on 'a.b b c.d', handler = ->
+
+        expect(events).toEqual ['before-a', 'after-a', 'before-b', 'after-b', 'before-c', 'after-c']
 
       it "emits a 'first-{event-name}-subscription-will-be-added' if there are no other handlers for the named event", ->
         events = []

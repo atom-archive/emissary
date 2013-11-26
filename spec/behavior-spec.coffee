@@ -37,6 +37,13 @@ describe "Behavior", ->
     expect(behavior.getSubscriptionCount('value')).toBe 0
     expect(signal.getSubscriptionCount('value')).toBe 0
 
+  describe "::getValue()", ->
+    it "returns the behavior's current value", ->
+      behavior.retain()
+      expect(behavior.getValue()).toBe 1
+      signal.emitValue(22)
+      expect(behavior.getValue()).toBe 22
+
   describe "::toBehavior()", ->
     it "returns itself because it's already a behavior", ->
       expect(behavior.toBehavior()).toBe behavior

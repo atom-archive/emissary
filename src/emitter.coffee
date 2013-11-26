@@ -18,6 +18,7 @@ class Emitter extends Mixin
     for eventName in eventNames.split(/\s+/) when eventName isnt ''
       [eventName, namespace] = eventName.split('.')
 
+      @emit "#{eventName}-subscription-will-be-added", handler
       if @incrementSubscriptionCount(eventName) is 1
         @emit "first-#{eventName}-subscription-will-be-added", handler
 

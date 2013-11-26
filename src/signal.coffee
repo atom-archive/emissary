@@ -7,14 +7,31 @@ module.exports =
 class Signal extends Emitter
   Subscriber.includeInto(this)
 
-  constructor: (subscribe) ->
-    @on 'first-value-subscription-will-be-added', (handler) => subscribe?.call(this)
-    @on 'last-value-subscription-removed', => @unsubscribe()
-
   @fromEmitter: (emitter, eventName) ->
     new Signal ->
       @subscribe emitter, eventName, (value, metadata...) =>
         @emit 'value', value, metadata...
+
+  constructor: (@subscribeCallback) ->
+    @retainCount = 0
+    @on 'value-subscription-will-be-added', => @retain()
+    @on 'value-subscription-removed', => @release()
+
+  retained: ->
+    @subscribeCallback?()
+
+  released: ->
+    @unsubscribe()
+
+  retain: ->
+    if ++@retainCount is 1
+      @retained?()
+    this
+
+  release: ->
+    if --@retainCount is 0
+      @released?()
+    this
 
   onValue: (handler) -> @on 'value', handler
 
