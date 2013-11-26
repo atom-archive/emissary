@@ -21,17 +21,10 @@ class Behavior extends Signal
     @value
 
   and: (right) ->
-    left = this
-    behavior = new Behavior ->
-      leftValue = null
-      rightValue = null
-      @subscribe left, 'value', (value) =>
-        leftValue = value
-        @emitValue(leftValue and rightValue)
-      @subscribe right, 'value', (value) =>
-        rightValue = value
-        @emitValue(leftValue and rightValue)
-    behavior.distinctUntilChanged()
+    helpers.combine(this, right, ((leftValue, rightValue) -> leftValue and rightValue)).distinctUntilChanged()
+
+  or: (right) ->
+    helpers.combine(this, right, ((leftValue, rightValue) -> leftValue or rightValue)).distinctUntilChanged()
 
   toBehavior: ->
     this
@@ -61,3 +54,5 @@ class Behavior extends Signal
 
   becomesGreaterThan: (targetValue) ->
     @becomes (value) -> value > targetValue
+
+helpers = require './helpers'

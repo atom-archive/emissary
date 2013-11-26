@@ -45,8 +45,8 @@ describe "Behavior", ->
       signal.emitValue(22)
       expect(behavior.getValue()).toBe 22
 
-  describe "::and(signal)", ->
-    it "returns a behavior whose value is true only when both behaviors are truthy", ->
+  describe "::and(behavior)", ->
+    it "returns a behavior whose value is the result of or-ing the receiver with the given behavior", ->
       behavior1 = new Behavior(true)
       behavior2 = new Behavior(false)
 
@@ -63,6 +63,26 @@ describe "Behavior", ->
 
       behavior1.emitValue(false)
       expect(values).toEqual [false, true, false]
+
+  describe "::or(behavior)", ->
+    it "returns a behavior whose value is the result of or-ing the receiver with the given behavior", ->
+      behavior1 = new Behavior(false)
+      behavior2 = new Behavior(false)
+
+      values = []
+      behavior1.or(behavior2).onValue (v) -> values.push(v)
+
+      expect(values).toEqual [false]
+
+      behavior2.emitValue(true)
+      expect(values).toEqual [false, true]
+
+      behavior1.emitValue('hey') # retains "short circuit" semantics
+      expect(values).toEqual [false, true, 'hey']
+
+      behavior1.emitValue(false)
+      behavior2.emitValue(0)
+      expect(values).toEqual [false, true, 'hey', true, 0]
 
   describe "::toBehavior()", ->
     it "returns itself because it's already a behavior", ->
