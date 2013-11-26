@@ -1,4 +1,5 @@
 Emitter = require '../src/emitter'
+Signal = require '../src/signal'
 
 describe "Signal", ->
   [emitter, signal] = []
@@ -54,6 +55,51 @@ describe "Signal", ->
       expect(values).toEqual []
       emitter.emit('a', i) for i in [0..10]
       expect(values).toEqual [2..12]
+
+  describe "::flatMapLatest(fn)", ->
+    it "switches to the most recent signal returned by mapping over the stream with the fn", ->
+      values = []
+      metadata = []
+      signal.flatMapLatest((signal) -> signal).onValue (v, m) ->
+        values.push(v)
+        metadata.push(m)
+
+      subsignal1 = new Signal
+      subsignal2 = new Signal
+      subsignal3 = new Signal
+
+      expect(subsignal1.getSubscriptionCount('value')).toBe 0
+      signal.emitValue(subsignal1)
+      expect(subsignal1.getSubscriptionCount('value')).toBe 1
+      expect(values).toEqual []
+
+      subsignal1.emitValue('a', 1)
+      subsignal1.emitValue('b', 2)
+      expect(values).toEqual ['a', 'b']
+      expect(metadata).toEqual [1, 2]
+
+      expect(subsignal2.getSubscriptionCount('value')).toBe 0
+      signal.emitValue(subsignal2)
+      expect(subsignal1.getSubscriptionCount('value')).toBe 0
+      expect(subsignal2.getSubscriptionCount('value')).toBe 1
+      expect(values).toEqual ['a', 'b']
+      expect(metadata).toEqual [1, 2]
+
+      subsignal1.emitValue('x', 0)
+      subsignal2.emitValue('c', 3)
+      subsignal2.emitValue('d', 4)
+      expect(values).toEqual ['a', 'b', 'c', 'd']
+      expect(metadata).toEqual [1, 2, 3, 4]
+
+      expect(subsignal3.getSubscriptionCount('value')).toBe 0
+      signal.emitValue(subsignal3)
+      expect(subsignal2.getSubscriptionCount('value')).toBe 0
+      expect(subsignal3.getSubscriptionCount('value')).toBe 1
+
+      subsignal2.emitValue('x', 0)
+      subsignal3.emitValue('e', 5)
+      expect(values).toEqual ['a', 'b', 'c', 'd', 'e']
+      expect(metadata).toEqual [1, 2, 3, 4, 5]
 
   describe "::skipUntil(valueOrPredicate)", ->
     describe "when passed a value", ->
