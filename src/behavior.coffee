@@ -20,6 +20,19 @@ class Behavior extends Signal
     throw new Error("Subscribe to or retain this behavior before calling getValue") unless @retainCount > 0
     @value
 
+  and: (right) ->
+    left = this
+    behavior = new Behavior ->
+      leftValue = null
+      rightValue = null
+      @subscribe left, 'value', (value) =>
+        leftValue = value
+        @emitValue(leftValue and rightValue)
+      @subscribe right, 'value', (value) =>
+        rightValue = value
+        @emitValue(leftValue and rightValue)
+    behavior.distinctUntilChanged()
+
   toBehavior: ->
     this
 
