@@ -18,6 +18,8 @@ class Signal extends Emitter
 
   onValue: (handler) -> @on 'value', handler
 
+  emitValue: (value, metadata) -> @emit 'value', value, metadata
+
   toBehavior: (initialValue) ->
     source = this
     @buildBehavior initialValue, ->
