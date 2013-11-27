@@ -1,6 +1,6 @@
 {
   "name": "emissary",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "Utility mixins for subscribing to and emitting events.",
   "main": "lib/emissary.js",
   "scripts": {
