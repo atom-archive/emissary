@@ -163,3 +163,18 @@ describe "Signal", ->
       emitter.emit('a', 2)
       emitter.emit('a', 2)
       expect(values).toEqual [1, 2]
+
+  describe "::equals(value)", ->
+    it "yields true when the signal's value is equal to the given value", ->
+      values = []
+      metadata = []
+      signal.equals(1).onValue (v, m) -> values.push(v); metadata.push(m)
+
+      signal.emitValue(0, 'a')
+      signal.emitValue(2, 'b')
+      signal.emitValue(1, 'c')
+      signal.emitValue(1, 'd')
+      signal.emitValue(5, 'e')
+      signal.emitValue(1, 'f')
+      expect(values).toEqual [false, true, false, true]
+      expect(metadata).toEqual ['a', 'c', 'e', 'f']
