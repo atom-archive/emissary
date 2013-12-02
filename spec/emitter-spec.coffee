@@ -153,6 +153,17 @@ describe "Emitter", ->
         ['last-foo-subscription-removed', fooHandler1]
       ]
 
+    it "emits 'after-{event-name}' after calling all event handlers for an event", ->
+      afterHandler = jasmine.createSpy("afterHandler").andCallFake ->
+        expect(fooHandler1).toHaveBeenCalledWith(3)
+        expect(fooHandler2).toHaveBeenCalledWith(3)
+
+      emitter.on 'foo', ->
+        emitter.on 'after-foo', afterHandler
+
+      emitter.emit('foo', 3)
+      expect(afterHandler).toHaveBeenCalledWith(3)
+
   describe "::off", ->
     describe "when called with no arguments", ->
       it "removes all subscriptions", ->

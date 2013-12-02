@@ -54,16 +54,19 @@ class Emitter extends Mixin
       @globalQueuedEvents.push [eventName, args...]
     else
       [eventName, namespace] = eventName.split('.')
+
       if namespace
         if queuedEvents = @queuedEventsByEventName?[eventName]
           queuedEvents.push(["#{eventName}.#{namespace}", args...])
         else if handlers = @eventHandlersByNamespace?[namespace]?[eventName]
           new Array(handlers...).forEach (handler) -> handler(args...)
+          @emit "after-#{eventName}", args...
       else
         if queuedEvents = @queuedEventsByEventName?[eventName]
           queuedEvents.push([eventName, args...])
         else if handlers = @eventHandlersByEventName?[eventName]
           new Array(handlers...).forEach (handler) -> handler(args...)
+          @emit "after-#{eventName}", args...
 
   off: (eventNames, handler) ->
     if eventNames
