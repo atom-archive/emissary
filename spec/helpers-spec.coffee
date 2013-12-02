@@ -20,7 +20,7 @@ describe "helpers", ->
         input1.emitValue(4, {a: 1})
         input2.emitValue(1, {b: 2})
         expect(values).toEqual [6, 9, 8]
-        expect(metadata).toEqual [undefined, {a: 1}, {b: 2}]
+        expect(metadata).toEqual [undefined, {source: input1, a: 1}, {source: input2, b: 2}]
 
     describe "when passed an array of behaviors and constant values", ->
       it "returns a behavior that yields an array of constant values based on the input behaviors and constants", ->
@@ -42,4 +42,4 @@ describe "helpers", ->
           [1, 4, 2, 'a', 'b']
           [1, 4, 2, 'x', 'b']
         ]
-        expect(metadata).toEqual [undefined, {a: 1}, {b: 2}]
+        expect(metadata).toEqual [undefined, {source: input1, a: 1}, {source: input2, b: 2}]

@@ -15,7 +15,7 @@ describe "Signal", ->
       expect(handler).toHaveBeenCalledWith(22)
       handler.reset()
       emitter.emit 'a', 44
-      expect(handler).toHaveBeenCalledWith(44)
+      expect(handler).toHaveBeenCalledWith(44, {source: signal})
 
     it "can take undefined as the behavior's initial value", ->
       behavior = signal.toBehavior(undefined)
@@ -36,7 +36,7 @@ describe "Signal", ->
 
       emitter.emit('a', 4)
       expect(values).toEqual [4]
-      expect(metadata).toEqual [{value: 4}]
+      expect(metadata).toEqual [{source: signal, value: 4}]
 
   describe "::filter(predicate)", ->
     it "returns a new signal that only emits values matching the given predicate", ->
@@ -76,20 +76,31 @@ describe "Signal", ->
       subsignal1.emitValue('a', {a: 1})
       subsignal1.emitValue('b', {b: 2})
       expect(values).toEqual ['a', 'b']
-      expect(metadata).toEqual [{a: 1}, {b: 2}]
+      expect(metadata).toEqual [
+        {source: subsignal1, a: 1}
+        {source: subsignal1, b: 2}
+      ]
 
       expect(subsignal2.getSubscriptionCount('value')).toBe 0
       signal.emitValue(subsignal2)
       expect(subsignal1.getSubscriptionCount('value')).toBe 0
       expect(subsignal2.getSubscriptionCount('value')).toBe 1
       expect(values).toEqual ['a', 'b']
-      expect(metadata).toEqual [{a: 1}, {b: 2}]
+      expect(metadata).toEqual [
+        {source: subsignal1, a: 1}
+        {source: subsignal1, b: 2}
+      ]
 
       subsignal1.emitValue('x', {x: 3})
       subsignal2.emitValue('c', {c: 4})
       subsignal2.emitValue('d', {d: 5})
       expect(values).toEqual ['a', 'b', 'c', 'd']
-      expect(metadata).toEqual [{a: 1}, {b: 2}, {c: 4}, {d: 5}]
+      expect(metadata).toEqual [
+        {source: subsignal1, a: 1}
+        {source: subsignal1, b: 2}
+        {source: subsignal2, c: 4}
+        {source: subsignal2, d: 5}
+      ]
 
       expect(subsignal3.getSubscriptionCount('value')).toBe 0
       signal.emitValue(subsignal3)
@@ -99,12 +110,24 @@ describe "Signal", ->
       subsignal2.emitValue('x', {x: 6})
       subsignal3.emitValue('e', {e: 7})
       expect(values).toEqual ['a', 'b', 'c', 'd', 'e']
-      expect(metadata).toEqual [{a: 1}, {b: 2}, {c: 4}, {d: 5}, {e: 7}]
+      expect(metadata).toEqual [
+        {source: subsignal1, a: 1}
+        {source: subsignal1, b: 2}
+        {source: subsignal2, c: 4}
+        {source: subsignal2, d: 5}
+        {source: subsignal3, e: 7}
+      ]
 
       signal.emitValue(null)
       expect(subsignal3.getSubscriptionCount('value')).toBe 0
       expect(values).toEqual ['a', 'b', 'c', 'd', 'e']
-      expect(metadata).toEqual [{a: 1}, {b: 2}, {c: 4}, {d: 5}, {e: 7}]
+      expect(metadata).toEqual [
+        {source: subsignal1, a: 1}
+        {source: subsignal1, b: 2}
+        {source: subsignal2, c: 4}
+        {source: subsignal2, d: 5}
+        {source: subsignal3, e: 7}
+      ]
 
   describe "::skipUntil(valueOrPredicate)", ->
     describe "when passed a value", ->
@@ -177,7 +200,7 @@ describe "Signal", ->
       signal.emitValue(5, {e: 5})
       signal.emitValue(1, {f: 6})
       expect(values).toEqual [false, true, false, true]
-      expect(metadata).toEqual [{a: 1}, {c: 3}, {e: 5}, {f: 6}]
+      expect(metadata).toEqual [{source: signal, a: 1}, {source: signal, c: 3}, {source: signal, e: 5}, {source: signal, f: 6}]
 
   describe "::isDefined()", ->
     it "yields true when the signal's value is defined", ->
@@ -192,4 +215,4 @@ describe "Signal", ->
       signal.emitValue(null, {e: 5})
       signal.emitValue(1, {f: 6})
       expect(values).toEqual [false, true, false, true]
-      expect(metadata).toEqual [{a: 1}, {c: 3}, {e: 5}, {f: 6}]
+      expect(metadata).toEqual [{source: signal, a: 1}, {source: signal, c: 3}, {source: signal, e: 5}, {source: signal, f: 6}]

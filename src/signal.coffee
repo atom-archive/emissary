@@ -35,7 +35,9 @@ class Signal extends Emitter
 
   onValue: (handler) -> @on 'value', handler
 
-  emitValue: (value, metadata...) -> @emit 'value', value, metadata...
+  emitValue: (value, metadata={}) ->
+    metadata.source ?= this
+    @emit 'value', value, metadata
 
   toBehavior: (initialValue) ->
     source = this
@@ -49,8 +51,9 @@ class Signal extends Emitter
   injectMetadata: (fn) ->
     source = this
     new @constructor ->
-      @subscribe source, 'value', (value, metadata...) =>
-        metadata = fn(value, metadata...)
+      @subscribe source, 'value', (value, metadata) =>
+        newMetadata = fn(value, metadata)
+        metadata[k] = v for k, v of newMetadata
         @emitValue value, metadata
 
   filter: (predicate) ->

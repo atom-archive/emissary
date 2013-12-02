@@ -93,10 +93,10 @@ describe "Behavior", ->
       behavior.changes().onValue handler = jasmine.createSpy("handler")
       expect(handler).not.toHaveBeenCalled()
       emitter.emit 'a', 7
-      expect(handler).toHaveBeenCalledWith(7)
+      expect(handler).toHaveBeenCalledWith(7, source: signal)
       handler.reset()
       emitter.emit 'a', 8
-      expect(handler).toHaveBeenCalledWith(8)
+      expect(handler).toHaveBeenCalledWith(8, source: signal)
 
   describe "::filter(predicate)", ->
     it "returns a new behavior that only changes to values matching the given predicate", ->
