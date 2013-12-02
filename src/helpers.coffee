@@ -14,10 +14,10 @@ combineArray = (array) ->
     ready = false
     for element, i in array when element.constructor.name is 'Behavior'
       do (element, i) =>
-        @subscribe element.onValue (value) =>
+        @subscribe element.onValue (value, metadata) =>
           outputArray = outputArray.slice() if ready
           outputArray[i] = value
-          @emitValue(outputArray) if ready
+          @emitValue(outputArray, metadata) if ready
     ready = true
     @emitValue(outputArray)
 

@@ -9,12 +9,18 @@ describe "helpers", ->
         input2 = new Behavior(2)
 
         values = []
-        combine(1, input1, 2, input2, (a, b, c, d) -> a + b + c + d).onValue (v) -> values.push v
-        expect(values).toEqual [6]
+        metadata = []
+        combine(1, input1, 2, input2, (a, b, c, d) -> a + b + c + d).onValue (v, m) ->
+          values.push v
+          metadata.push m
 
-        input1.emitValue(4)
-        input2.emitValue(1)
+        expect(values).toEqual [6]
+        expect(metadata).toEqual [undefined]
+
+        input1.emitValue(4, 'a')
+        input2.emitValue(1, 'b')
         expect(values).toEqual [6, 9, 8]
+        expect(metadata).toEqual [undefined, 'a', 'b']
 
     describe "when passed an array of behaviors and constant values", ->
       it "returns a behavior that yields an array of constant values based on the input behaviors and constants", ->
@@ -22,13 +28,18 @@ describe "helpers", ->
         input2 = new Behavior('a')
 
         values = []
-        combine([1, input1, 2, input2, 'b']).onValue (v) -> values.push v
+        metadata = []
+        combine([1, input1, 2, input2, 'b']).onValue (v, m) ->
+          values.push v
+          metadata.push m
         expect(values).toEqual [[1, 1, 2, 'a', 'b']]
+        expect(metadata).toEqual [undefined]
 
-        input1.emit('value', 4)
-        input2.emit('value', 'x')
+        input1.emitValue(4, 'a')
+        input2.emitValue('x', 'b')
         expect(values).toEqual [
           [1, 1, 2, 'a', 'b']
           [1, 4, 2, 'a', 'b']
           [1, 4, 2, 'x', 'b']
         ]
+        expect(metadata).toEqual [undefined, 'a', 'b']
