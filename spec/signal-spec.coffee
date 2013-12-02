@@ -73,38 +73,38 @@ describe "Signal", ->
       expect(subsignal1.getSubscriptionCount('value')).toBe 1
       expect(values).toEqual []
 
-      subsignal1.emitValue('a', 1)
-      subsignal1.emitValue('b', 2)
+      subsignal1.emitValue('a', {a: 1})
+      subsignal1.emitValue('b', {b: 2})
       expect(values).toEqual ['a', 'b']
-      expect(metadata).toEqual [1, 2]
+      expect(metadata).toEqual [{a: 1}, {b: 2}]
 
       expect(subsignal2.getSubscriptionCount('value')).toBe 0
       signal.emitValue(subsignal2)
       expect(subsignal1.getSubscriptionCount('value')).toBe 0
       expect(subsignal2.getSubscriptionCount('value')).toBe 1
       expect(values).toEqual ['a', 'b']
-      expect(metadata).toEqual [1, 2]
+      expect(metadata).toEqual [{a: 1}, {b: 2}]
 
-      subsignal1.emitValue('x', 0)
-      subsignal2.emitValue('c', 3)
-      subsignal2.emitValue('d', 4)
+      subsignal1.emitValue('x', {x: 3})
+      subsignal2.emitValue('c', {c: 4})
+      subsignal2.emitValue('d', {d: 5})
       expect(values).toEqual ['a', 'b', 'c', 'd']
-      expect(metadata).toEqual [1, 2, 3, 4]
+      expect(metadata).toEqual [{a: 1}, {b: 2}, {c: 4}, {d: 5}]
 
       expect(subsignal3.getSubscriptionCount('value')).toBe 0
       signal.emitValue(subsignal3)
       expect(subsignal2.getSubscriptionCount('value')).toBe 0
       expect(subsignal3.getSubscriptionCount('value')).toBe 1
 
-      subsignal2.emitValue('x', 0)
-      subsignal3.emitValue('e', 5)
+      subsignal2.emitValue('x', {x: 6})
+      subsignal3.emitValue('e', {e: 7})
       expect(values).toEqual ['a', 'b', 'c', 'd', 'e']
-      expect(metadata).toEqual [1, 2, 3, 4, 5]
+      expect(metadata).toEqual [{a: 1}, {b: 2}, {c: 4}, {d: 5}, {e: 7}]
 
       signal.emitValue(null)
       expect(subsignal3.getSubscriptionCount('value')).toBe 0
       expect(values).toEqual ['a', 'b', 'c', 'd', 'e']
-      expect(metadata).toEqual [1, 2, 3, 4, 5]
+      expect(metadata).toEqual [{a: 1}, {b: 2}, {c: 4}, {d: 5}, {e: 7}]
 
   describe "::skipUntil(valueOrPredicate)", ->
     describe "when passed a value", ->
@@ -170,14 +170,14 @@ describe "Signal", ->
       metadata = []
       signal.equals(1).onValue (v, m) -> values.push(v); metadata.push(m)
 
-      signal.emitValue(0, 'a')
-      signal.emitValue(2, 'b')
-      signal.emitValue(1, 'c')
-      signal.emitValue(1, 'd')
-      signal.emitValue(5, 'e')
-      signal.emitValue(1, 'f')
+      signal.emitValue(0, {a: 1})
+      signal.emitValue(2, {b: 2})
+      signal.emitValue(1, {c: 3})
+      signal.emitValue(1, {d: 4})
+      signal.emitValue(5, {e: 5})
+      signal.emitValue(1, {f: 6})
       expect(values).toEqual [false, true, false, true]
-      expect(metadata).toEqual ['a', 'c', 'e', 'f']
+      expect(metadata).toEqual [{a: 1}, {c: 3}, {e: 5}, {f: 6}]
 
   describe "::isDefined()", ->
     it "yields true when the signal's value is defined", ->
@@ -185,11 +185,11 @@ describe "Signal", ->
       metadata = []
       signal.isDefined().onValue (v, m) -> values.push(v); metadata.push(m)
 
-      signal.emitValue(null, 'a')
-      signal.emitValue(undefined, 'b')
-      signal.emitValue(1, 'c')
-      signal.emitValue(0, 'd')
-      signal.emitValue(null, 'e')
-      signal.emitValue(1, 'f')
+      signal.emitValue(null, {a: 1})
+      signal.emitValue(undefined, {b: 2})
+      signal.emitValue(1, {c: 3})
+      signal.emitValue(0, {d: 4})
+      signal.emitValue(null, {e: 5})
+      signal.emitValue(1, {f: 6})
       expect(values).toEqual [false, true, false, true]
-      expect(metadata).toEqual ['a', 'c', 'e', 'f']
+      expect(metadata).toEqual [{a: 1}, {c: 3}, {e: 5}, {f: 6}]
