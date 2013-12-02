@@ -178,3 +178,18 @@ describe "Signal", ->
       signal.emitValue(1, 'f')
       expect(values).toEqual [false, true, false, true]
       expect(metadata).toEqual ['a', 'c', 'e', 'f']
+
+  describe "::isDefined()", ->
+    it "yields true when the signal's value is defined", ->
+      values = []
+      metadata = []
+      signal.isDefined().onValue (v, m) -> values.push(v); metadata.push(m)
+
+      signal.emitValue(null, 'a')
+      signal.emitValue(undefined, 'b')
+      signal.emitValue(1, 'c')
+      signal.emitValue(0, 'd')
+      signal.emitValue(null, 'e')
+      signal.emitValue(1, 'f')
+      expect(values).toEqual [false, true, false, true]
+      expect(metadata).toEqual ['a', 'c', 'e', 'f']

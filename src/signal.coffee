@@ -128,8 +128,10 @@ class Signal extends Emitter
           @emit 'value', newValue, metadata...
 
   equals: (expected) ->
-    @map((actual) -> isEqual(actual, expected))
-      .distinctUntilChanged()
+    @map((actual) -> isEqual(actual, expected)).distinctUntilChanged()
+
+  isDefined: ->
+    @map((value) -> value?).distinctUntilChanged()
 
   # Private: Builds a Behavior instance, lazily requiring the Behavior subclass
   # to avoid circular require.
