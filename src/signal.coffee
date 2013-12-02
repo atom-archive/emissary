@@ -10,7 +10,7 @@ class Signal extends Emitter
   @fromEmitter: (emitter, eventName) ->
     new Signal ->
       @subscribe emitter, eventName, (value, metadata...) =>
-        @emit 'value', value, metadata...
+        @emitValue value, metadata...
 
   constructor: (@subscribeCallback) ->
     @retainCount = 0
@@ -35,13 +35,13 @@ class Signal extends Emitter
 
   onValue: (handler) -> @on 'value', handler
 
-  emitValue: (value, metadata) -> @emit 'value', value, metadata
+  emitValue: (value, metadata...) -> @emit 'value', value, metadata...
 
   toBehavior: (initialValue) ->
     source = this
     @buildBehavior initialValue, ->
       @subscribe source, 'value', (value, metadata...) =>
-        @emit 'value', value, metadata...
+        @emitValue value, metadata...
 
   changes: ->
     this
@@ -51,14 +51,14 @@ class Signal extends Emitter
     new @constructor ->
       @subscribe source, 'value', (value, metadata...) =>
         metadata = fn(value, metadata...)
-        @emit 'value', value, metadata
+        @emitValue value, metadata
 
   filter: (predicate) ->
     source = this
     new @constructor ->
       @subscribe source, 'value', (value, metadata...) =>
         if predicate.call(value, value)
-          @emit 'value', value, metadata...
+          @emitValue value, metadata...
 
   filterDefined: ->
     @filter (value) -> value?
@@ -67,7 +67,7 @@ class Signal extends Emitter
     source = this
     new @constructor ->
       @subscribe source, 'value', (value, metadata...) =>
-        @emit 'value', fn(value), metadata...
+        @emitValue fn(value), metadata...
 
   flatMapLatest: (fn) ->
     source = @map(fn)
@@ -99,7 +99,7 @@ class Signal extends Emitter
     @buildBehavior initialValue, ->
       oldValue = initialValue
       @subscribe source, 'value', (newValue, metadata...) =>
-        @emit 'value', (oldValue = fn(oldValue, newValue)), metadata...
+        @emitValue (oldValue = fn(oldValue, newValue)), metadata...
 
   diff: (initialValue, fn) ->
     source = this
@@ -108,7 +108,7 @@ class Signal extends Emitter
       @subscribe source, 'value', (newValue, metadata...) =>
         fnOldValue = oldValue
         oldValue = newValue
-        @emit 'value', fn(fnOldValue, newValue), metadata...
+        @emitValue fn(fnOldValue, newValue), metadata...
 
   distinctUntilChanged: ->
     source = this
@@ -121,11 +121,11 @@ class Signal extends Emitter
             oldValue = newValue
           else
             oldValue = newValue
-            @emit 'value', newValue, metadata...
+            @emitValue newValue, metadata...
         else
           receivedValue = true
           oldValue = newValue
-          @emit 'value', newValue, metadata...
+          @emitValue newValue, metadata...
 
   equals: (expected) ->
     @map((actual) -> isEqual(actual, expected)).distinctUntilChanged()

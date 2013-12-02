@@ -36,7 +36,7 @@ class Behavior extends Signal
       gotFirst = false
       @subscribe source, 'value', (value, metadata...) =>
         if gotFirst
-          @emit 'value', value, metadata...
+          @emitValue value, metadata...
         gotFirst = true
 
   becomes: (predicateOrTargetValue) ->
