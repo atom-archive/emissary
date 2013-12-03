@@ -67,6 +67,10 @@ class Signal extends Emitter
     @filter (value) -> value?
 
   map: (fn) ->
+    if typeof fn is 'string'
+      property = fn
+      fn = (value) -> value?[property]
+
     source = this
     new @constructor ->
       @subscribe source, 'value', (value, metadata...) =>
