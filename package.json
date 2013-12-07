@@ -30,7 +30,8 @@
   ],
   "dependencies": {
     "tantamount": "~0.6.0",
-    "mixto": "0.3.0"
+    "mixto": "0.3.0",
+    "property-accessors": "~0.1.0"
   },
   "devDependencies": {
     "jasmine-focused": "~0.14.0",

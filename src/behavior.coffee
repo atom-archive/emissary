@@ -1,8 +1,11 @@
 isEqual = require 'tantamount'
+PropertyAccessors = require 'property-accessors'
 Signal = require './signal'
 
 module.exports =
 class Behavior extends Signal
+  PropertyAccessors.includeInto(this)
+
   constructor: (args...) ->
     @value = args.shift() if typeof args[0]?.call isnt 'function'
     super(subscribeCallback = args.shift())
@@ -30,7 +33,7 @@ class Behavior extends Signal
     this
 
   # TODO: Write in terms of ::skip when it's added
-  changes: ->
+  @::lazyAccessor 'changes', ->
     source = this
     new Signal ->
       gotFirst = false
@@ -46,8 +49,7 @@ class Behavior extends Signal
 
     predicate = predicateOrTargetValue
     @map((value) -> !!predicate(value))
-    .distinctUntilChanged()
-    .changes()
+    .distinctUntilChanged().changes
 
   becomesLessThan: (targetValue) ->
     @becomes (value) -> value < targetValue

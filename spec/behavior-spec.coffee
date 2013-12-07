@@ -88,9 +88,9 @@ describe "Behavior", ->
     it "returns itself because it's already a behavior", ->
       expect(behavior.toBehavior()).toBe behavior
 
-  describe "::changes()", ->
+  describe "::changes", ->
     it "emits all changes to the behavior, but not its initial value", ->
-      behavior.changes().onValue handler = jasmine.createSpy("handler")
+      behavior.changes.onValue handler = jasmine.createSpy("handler")
       expect(handler).not.toHaveBeenCalled()
       emitter.emit 'a', 7
       expect(handler).toHaveBeenCalledWith(7, source: signal)
