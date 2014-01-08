@@ -1,4 +1,5 @@
 Mixin = require 'mixto'
+Signal = null
 
 module.exports =
 class Subscriber extends Mixin
@@ -35,6 +36,7 @@ class Subscriber extends Mixin
     if args.length is 0
       @addSubscription(eventEmitterOrSubscription)
     else
+      args.unshift('value') if args.length is 1 and eventEmitterOrSubscription.isSignal
       @subscribeWith(eventEmitterOrSubscription, 'on', args)
 
   subscribeToCommand: (eventEmitter, args...) ->

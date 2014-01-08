@@ -1,5 +1,6 @@
 Subscriber = require '../src/subscriber'
 Emitter = require '../src/emitter'
+Signal = require '../src/signal'
 
 describe "Subscriber", ->
   [emitter1, emitter2, event1Handler, event2Handler, subscriber] = []
@@ -55,3 +56,13 @@ describe "Subscriber", ->
     subscriber.unsubscribe()
     emitter2.emit 'event2', 'bar'
     expect(events).toEqual ['foo']
+
+  it "automatically subscribes to signal 'value' events when the event name is omitted", ->
+    signal = new Signal
+    values = []
+    subscriber.subscribe signal, (v) -> values.push(v)
+
+    signal.emitValue(1)
+    signal.emitValue(10)
+    signal.emitValue(100)
+    expect(values).toEqual [1, 10, 100]

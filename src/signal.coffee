@@ -17,6 +17,8 @@ class Signal extends Emitter
     @on 'value-subscription-will-be-added', => @retain()
     @on 'value-subscription-removed', => @release()
 
+  isSignal: true
+
   retained: ->
     @subscribeCallback?()
 
