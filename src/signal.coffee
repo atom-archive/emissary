@@ -82,12 +82,14 @@ class Signal extends Emitter
     source = @map(fn)
     new @constructor ->
       currentSignal = null
-      @subscribe source, 'value', (newSignal) =>
+      @subscribe source, 'value', (newSignal, outerMetadata) =>
         @unsubscribe(currentSignal) if currentSignal?
         currentSignal = newSignal
         if currentSignal?
-          @subscribe currentSignal, 'value', (value, metadata) =>
-            @emitValue(value, metadata)
+          @subscribe currentSignal, 'value', (value, innerMetadata) =>
+            @emitValue(value, innerMetadata)
+        else
+          @emitValue(undefined, outerMetadata)
 
   skipUntil: (predicateOrTargetValue) ->
     unless typeof predicateOrTargetValue is 'function'

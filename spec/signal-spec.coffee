@@ -118,15 +118,16 @@ describe "Signal", ->
         {source: subsignal3, e: 7}
       ]
 
-      signal.emitValue(null)
+      signal.emitValue(null, x: 1)
       expect(subsignal3.getSubscriptionCount('value')).toBe 0
-      expect(values).toEqual ['a', 'b', 'c', 'd', 'e']
+      expect(values).toEqual ['a', 'b', 'c', 'd', 'e', undefined]
       expect(metadata).toEqual [
         {source: subsignal1, a: 1}
         {source: subsignal1, b: 2}
         {source: subsignal2, c: 4}
         {source: subsignal2, d: 5}
         {source: subsignal3, e: 7}
+        {source: signal, x: 1}
       ]
 
   describe "::skipUntil(valueOrPredicate)", ->
