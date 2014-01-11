@@ -78,7 +78,7 @@ class Signal extends Emitter
       @subscribe source, 'value', (value, metadata...) =>
         @emitValue fn.call(value, value), metadata...
 
-  flatMapLatest: (fn) ->
+  switch: (fn) ->
     source = @map(fn)
     new @constructor ->
       currentSignal = null

@@ -56,11 +56,11 @@ describe "Signal", ->
       emitter.emit('a', i) for i in [0..10]
       expect(values).toEqual [2..12]
 
-  describe "::flatMapLatest(fn)", ->
+  describe "::switch(fn)", ->
     it "switches to the most recent signal returned by mapping over the stream with the fn", ->
       values = []
       metadata = []
-      signal.flatMapLatest((signal) -> signal).onValue (v, m) ->
+      signal.switch((signal) -> signal).onValue (v, m) ->
         values.push(v)
         metadata.push(m)
 
