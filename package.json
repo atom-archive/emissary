@@ -30,7 +30,7 @@
   ],
   "dependencies": {
     "underscore-plus": "1.x",
-    "mixto": "0.3.0",
+    "mixto": "1.x",
     "property-accessors": "~0.1.0"
   },
   "devDependencies": {
