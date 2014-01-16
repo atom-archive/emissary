@@ -1,4 +1,4 @@
-isEqual = require 'tantamount'
+{isEqual} = require 'underscore-plus'
 Emitter = require './emitter'
 Subscriber = require './subscriber'
 Behavior = null

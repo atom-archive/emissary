@@ -1,4 +1,4 @@
-isEqual = require 'tantamount'
+{isEqual} = require 'underscore-plus'
 PropertyAccessors = require 'property-accessors'
 Signal = require './signal'
 

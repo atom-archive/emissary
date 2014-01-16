@@ -29,7 +29,7 @@
     }
   ],
   "dependencies": {
-    "tantamount": "~0.6.0",
+    "underscore-plus": "1.x",
     "mixto": "0.3.0",
     "property-accessors": "~0.1.0"
   },
