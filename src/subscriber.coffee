@@ -1,5 +1,6 @@
 Mixin = require 'mixto'
 Signal = null
+WeakMap = WeakMap or require('harmony-collections').WeakMap
 
 module.exports =
 class Subscriber extends Mixin
