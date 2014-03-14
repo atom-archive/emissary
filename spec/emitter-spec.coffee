@@ -84,14 +84,18 @@ describe "Emitter", ->
         emitter.emit 'b'
         expect(events).toEqual [2, 1]
 
-    it "returns an object with an off() method that removes the handler when called", ->
+    it "returns a Subscription with an .off() method that removes the handler when called", ->
       events = []
       subscription = emitter.on 'b', (event) -> events.push(event)
 
       emitter.emit 'b', 'b1'
       expect(events).toEqual ['b1']
 
+      subscription.on 'cancelled', subscriptionCancelledHandler = jasmine.createSpy("subscriptionCancelledHandler")
+      expect(subscription.cancelled).toBe false
       subscription.off()
+      expect(subscriptionCancelledHandler).toHaveBeenCalled()
+      expect(subscription.cancelled).toBe true
       emitter.emit 'b', 'b2'
       expect(events).toEqual ['b1']
 

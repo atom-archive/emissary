@@ -1,5 +1,6 @@
 Mixin = require 'mixto'
 Signal = null # required below to avoid circularity
+Subscription = null # required below to avoid circularity
 
 subscriptionRemovedPattern = /^(last-)?.+-subscription-removed$/
 
@@ -34,7 +35,8 @@ class Emitter extends Mixin
 
       @emit "#{eventName}-subscription-added", handler
 
-    {emitter: this, off: => @off(eventNames, handler)}
+    Subscription ?= require './subscription'
+    new Subscription(this, eventNames, handler)
 
   once: (eventName, handler) ->
     subscription = @on eventName, (args...) ->
