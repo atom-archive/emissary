@@ -31,7 +31,7 @@
   "dependencies": {
     "underscore-plus": "1.x",
     "mixto": "1.x",
-    "property-accessors": "1.x",
+    "property-accessors": "^1.1",
     "harmony-collections": "git+https://github.com/Benvie/harmony-collections.git#e81b4b808359e2def9eeeabfdee69c2989e1fe96"
   },
   "devDependencies": {
