@@ -1,6 +1,7 @@
 Mixin = require 'mixto'
 Signal = null
 WeakMap = global.WeakMap ? require('harmony-collections').WeakMap
+Subscription = require './subscription'
 
 module.exports =
 class Subscriber extends Mixin
@@ -10,14 +11,9 @@ class Subscriber extends Mixin
 
     eventEmitter[methodName](args...)
 
-    eventName = args[0]
+    eventNames = args[0]
     callback = args[args.length - 1]
-    @addSubscription
-      emitter: eventEmitter
-      off: ->
-        # node's EventEmitter doesn't have 'off' method.
-        removeListener = eventEmitter.off ? eventEmitter.removeListener
-        removeListener.call eventEmitter, eventName, callback
+    @addSubscription(new Subscription(eventEmitter, eventNames, callback))
 
   addSubscription: (subscription) ->
     @subscriptions ?= []

@@ -9,7 +9,9 @@ class Subscription extends Emitter
   off: ->
     return if @cancelled
 
-    @emitter.off(@eventNames, @handler)
+    unsubscribe = @emitter.off ? @emitter.removeListener
+    unsubscribe.call(@emitter, @eventNames, @handler)
+
     @emitter = null
     @handler = null
     @cancelled = true
