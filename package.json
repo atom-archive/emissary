@@ -29,10 +29,11 @@
     }
   ],
   "dependencies": {
-    "underscore-plus": "1.x",
+    "grim": "^0.11.0",
+    "harmony-collections": "git+https://github.com/Benvie/harmony-collections.git#e81b4b808359e2def9eeeabfdee69c2989e1fe96",
     "mixto": "1.x",
     "property-accessors": "^1.1",
-    "harmony-collections": "git+https://github.com/Benvie/harmony-collections.git#e81b4b808359e2def9eeeabfdee69c2989e1fe96"
+    "underscore-plus": "1.x"
   },
   "devDependencies": {
     "jasmine-focused": "1.x",

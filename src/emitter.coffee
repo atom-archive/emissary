@@ -1,4 +1,5 @@
 Mixin = require 'mixto'
+Grim = require 'grim'
 Signal = null # required below to avoid circularity
 Subscription = null # required below to avoid circularity
 
@@ -28,6 +29,7 @@ class Emitter extends Mixin
       @eventHandlersByEventName[eventName].push(handler)
 
       if namespace
+        Grim.deprecate("Emissary namespaces are deprecated. Call .off() on the returned subscription object instead.")
         @eventHandlersByNamespace ?= {}
         @eventHandlersByNamespace[namespace] ?= {}
         @eventHandlersByNamespace[namespace][eventName] ?= []
@@ -58,6 +60,7 @@ class Emitter extends Mixin
       [eventName, namespace] = eventName.split('.')
 
       if namespace
+        Grim.deprecate("Emissary namespaces are deprecated.")
         if queuedEvents = @queuedEventsByEventName?[eventName]
           queuedEvents.push(["#{eventName}.#{namespace}", args...])
         else if handlers = @eventHandlersByNamespace?[namespace]?[eventName]
@@ -71,6 +74,8 @@ class Emitter extends Mixin
           @emit "after-#{eventName}", args...
 
   off: (eventNames, handler) ->
+    Grim.deprecate("Call .off() on the subscription object returned by ::on() instead.")
+
     if eventNames
       for eventName in eventNames.split(/\s+/) when eventName isnt ''
         [eventName, namespace] = eventName.split('.')
