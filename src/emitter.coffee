@@ -51,12 +51,24 @@ class Emitter extends Mixin
   behavior: (eventName, initialValue) ->
     @signal(eventName).toBehavior(initialValue)
 
-  emit: (eventName, args...) ->
+  emit: (eventName, payload) ->
+    if arguments.length > 2 or /\s|\./.test(eventName)
+      @emitSlow.apply(this, arguments)
+    else
+      if @globalQueuedEvents?
+        @globalQueuedEvents.push [eventName, payload]
+      else
+        if queuedEvents = @queuedEventsByEventName?[eventName]
+          queuedEvents.push([eventName, payload])
+        else if handlers = @eventHandlersByEventName?[eventName]
+          handler(payload) for handler in handlers.slice()
+          @emit "after-#{eventName}", payload
+
+  emitSlow: (eventName, args...) ->
     if @globalQueuedEvents
       @globalQueuedEvents.push [eventName, args...]
     else
       [eventName, namespace] = eventName.split('.')
-
       if namespace
         if queuedEvents = @queuedEventsByEventName?[eventName]
           queuedEvents.push(["#{eventName}.#{namespace}", args...])
