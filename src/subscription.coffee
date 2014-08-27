@@ -7,6 +7,9 @@ class Subscription extends Emitter
   constructor: (@emitter, @eventNames, @handler) ->
 
   off: ->
+    @dispose()
+
+  dispose: ->
     return if @cancelled
 
     unsubscribe = @emitter.off ? @emitter.removeListener
