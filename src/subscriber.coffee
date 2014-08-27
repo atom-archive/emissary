@@ -16,16 +16,16 @@ class Subscriber extends Mixin
     @addSubscription(new Subscription(eventEmitter, eventNames, callback))
 
   addSubscription: (subscription) ->
-    @subscriptions ?= []
-    @subscriptions.push(subscription)
+    @_subscriptions ?= []
+    @_subscriptions.push(subscription)
 
     {emitter} = subscription
     if emitter?
-      @subscriptionsByObject ?= new WeakMap
-      if @subscriptionsByObject.has(emitter)
-        @subscriptionsByObject.get(emitter).push(subscription)
+      @_subscriptionsByObject ?= new WeakMap
+      if @_subscriptionsByObject.has(emitter)
+        @_subscriptionsByObject.get(emitter).push(subscription)
       else
-        @subscriptionsByObject.set(emitter, [subscription])
+        @_subscriptionsByObject.set(emitter, [subscription])
 
     subscription
 
@@ -41,12 +41,15 @@ class Subscriber extends Mixin
 
   unsubscribe: (object) ->
     if object?
-      for subscription in @subscriptionsByObject?.get(object) ? []
-        subscription.off()
-        index = @subscriptions.indexOf(subscription)
-        @subscriptions.splice(index, 1) if index >= 0
-      @subscriptionsByObject?.delete(object)
+      for subscription in @_subscriptionsByObject?.get(object) ? []
+        subscription.off?()
+        subscription.dispose?()
+        index = @_subscriptions.indexOf(subscription)
+        @_subscriptions.splice(index, 1) if index >= 0
+      @_subscriptionsByObject?.delete(object)
     else
-      subscription.off() for subscription in @subscriptions ? []
-      @subscriptions = null
-      @subscriptionsByObject = null
+      for subscription in @_subscriptions ? []
+        subscription.off?()
+        subscription.dispose?()
+      @_subscriptions = null
+      @_subscriptionsByObject = null
