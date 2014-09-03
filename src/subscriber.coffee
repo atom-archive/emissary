@@ -42,14 +42,18 @@ class Subscriber extends Mixin
   unsubscribe: (object) ->
     if object?
       for subscription in @_subscriptionsByObject?.get(object) ? []
-        subscription.off?()
-        subscription.dispose?()
+        if typeof subscription.dispose is 'function'
+          subscription.dispose()
+        else
+          subscription.off()
         index = @_subscriptions.indexOf(subscription)
         @_subscriptions.splice(index, 1) if index >= 0
       @_subscriptionsByObject?.delete(object)
     else
       for subscription in @_subscriptions ? []
-        subscription.off?()
-        subscription.dispose?()
+        if typeof subscription.dispose is 'function'
+          subscription.dispose()
+        else
+          subscription.off()
       @_subscriptions = null
       @_subscriptionsByObject = null
