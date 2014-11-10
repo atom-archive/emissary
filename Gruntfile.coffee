@@ -22,13 +22,13 @@ module.exports = (grunt) ->
 
     shell:
       'test-with-native-weakmap':
-        command: 'node --harmony_collections node_modules/.bin/jasmine-focused --coffee --captureExceptions spec'
+        command: 'node --harmony_collections node_modules/jasmine-focused/bin/jasmine-focused --coffee --captureExceptions spec'
         options:
           stdout: true
           stderr: true
           failOnError: true
       'test-with-weakmap-module':
-        command: 'node node_modules/.bin/jasmine-focused --coffee --captureExceptions spec'
+        command: 'node node_modules/jasmine-focused/bin/jasmine-focused --coffee --captureExceptions spec'
         options:
           stdout: true
           stderr: true
