@@ -32,7 +32,8 @@
     "underscore-plus": "1.x",
     "mixto": "1.x",
     "property-accessors": "^1.1",
-    "harmony-collections": "git+https://github.com/Benvie/harmony-collections.git#e81b4b808359e2def9eeeabfdee69c2989e1fe96"
+    "harmony-collections": "git+https://github.com/Benvie/harmony-collections.git#e81b4b808359e2def9eeeabfdee69c2989e1fe96",
+    "es6-weak-map": "^0.1.2"
   },
   "devDependencies": {
     "jasmine-focused": "1.x",

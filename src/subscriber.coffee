@@ -1,6 +1,6 @@
 Mixin = require 'mixto'
 Signal = null
-WeakMap = global.WeakMap ? require('harmony-collections').WeakMap
+WeakMap = require 'es6-weak-map'
 Subscription = require './subscription'
 
 module.exports =
