@@ -1,6 +1,6 @@
 Mixin = require 'mixto'
 Signal = null
-WeakMap = require 'es6-weak-map'
+WeakMap = global.WeakMap ? require 'es6-weak-map'
 Subscription = require './subscription'
 
 module.exports =
